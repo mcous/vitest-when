@@ -1,0 +1,92 @@
+name: ci
+
+on:
+  pull_request:
+    branches: main
+  push:
+    branches: main
+    tags: v*
+
+jobs:
+  test:
+    name: Test / Node.js ${{ matrix.node-version }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: ['16', '18', '20']
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@c3b53f6a16e57305370b4ae5a540c2077a1d50dd
+        with:
+          run_install: true
+
+      - name: Run tests
+        run: pnpm coverage
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: pnpm
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@c3b53f6a16e57305370b4ae5a540c2077a1d50dd
+        with:
+          run_install: true
+
+      - name: Build and check
+        run: pnpm build-and-check
+
+      - name: Upload publish artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: npm-dist
+          path: dist
+
+  deploy:
+    if: ${{ github.repository == 'mcous/vitest-when' && startsWith(github.ref, 'refs/tags/v') }}
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    needs: [test, build]
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@c3b53f6a16e57305370b4ae5a540c2077a1d50dd
+
+      - name: Download publish artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: npm-dist
+          path: dist
+
+      - name: Publish to npm
+        run: pnpm publish

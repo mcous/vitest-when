@@ -1,0 +1,8 @@
+{
+  "extends": "@viamrobotics/typescript-config/base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["vitest.config.ts", "src", "test", "example"]
+}

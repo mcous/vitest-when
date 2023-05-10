@@ -1,0 +1,85 @@
+{
+  "name": "vitest-when",
+  "version": "0.0.0",
+  "description": "Stub behaviors of vitest mocks based on how they are called",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/vitest-when.d.ts",
+      "import": "./dist/vitest-when.js",
+      "require": "./dist/vitest-when.cjs"
+    }
+  },
+  "types": "./dist/vitest-when.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "publishConfig": {
+    "provenance": true
+  },
+  "packageManager": "pnpm@8.5.0",
+  "author": "Michael Cousins <michael@cousins.io> (https://mike.cousins.io)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcous/vitest-when.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mcous/vitest-when/issues"
+  },
+  "homepage": "https://github.com/mcous/vitest-when#readme",
+  "keywords": [
+    "tdd",
+    "testing",
+    "mocking"
+  ],
+  "scripts": {
+    "all": "concurrently -g pnpm:coverage pnpm:build pnpm:check:*",
+    "build-and-check": "concurrently -g pnpm:build pnpm:check:*",
+    "build": "tsup --clean --sourcemap --dts --format esm,cjs --target node14 src/vitest-when.ts",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "check:format": "pnpm run _prettier --check",
+    "check:lint": "pnpm run _eslint",
+    "format": "pnpm run _prettier --write && pnpm run _eslint --fix",
+    "_eslint": "eslint --ignore-path .lintignore \"**/*.ts\"",
+    "_prettier": "prettier --ignore-path .lintignore \"**/*.@(ts|json|yaml)\""
+  },
+  "eslintConfig": {
+    "extends": "@viamrobotics/eslint-config",
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
+    "settings": {
+      "import/resolver": {
+        "typescript": {
+          "project": "./tsconfig.json"
+        }
+      }
+    }
+  },
+  "prettier": "@viamrobotics/prettier-config",
+  "peerDependencies": {
+    "vitest": ">=0.31.0 <1.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.59.5",
+    "@typescript-eslint/parser": "^5.59.5",
+    "@viamrobotics/eslint-config": "^0.0.4",
+    "@viamrobotics/prettier-config": "^0.0.1",
+    "@viamrobotics/typescript-config": "^0.0.3",
+    "@vitest/coverage-istanbul": "^0.31.0",
+    "concurrently": "^8.0.1",
+    "eslint": "^8.40.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-sonarjs": "^0.19.0",
+    "eslint-plugin-unicorn": "^46.0.1",
+    "prettier": "^2.8.8",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.4",
+    "vitest": "^0.31.0"
+  }
+}

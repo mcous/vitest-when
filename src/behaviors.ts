@@ -1,3 +1,5 @@
+import { equals } from '@vitest/expect';
+
 export interface BehaviorEntry<TArgs extends unknown[], TReturn> {
   args: TArgs;
   returnValue?: TReturn;
@@ -52,7 +54,7 @@ const behaviorHasArgs = <TArgs extends unknown[], TReturn>(args: TArgs) => {
     let i = 0;
 
     while (i < args.length || i < behavior.args.length) {
-      if (args[i] !== behavior.args[i]) {
+      if (!equals(args[i], behavior.args[i])) {
         return false;
       }
 

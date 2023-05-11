@@ -19,6 +19,9 @@ devDependencies:
   '@vitest/coverage-istanbul':
     specifier: ^0.31.0
     version: 0.31.0(vitest@0.31.0)
+  '@vitest/expect':
+    specifier: ^0.31.0
+    version: 0.31.0
   concurrently:
     specifier: ^8.0.1
     version: 8.0.1

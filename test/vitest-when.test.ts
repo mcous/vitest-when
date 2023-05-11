@@ -2,6 +2,21 @@ import { vi, describe, expect, it } from 'vitest';
 
 import * as subject from '../src/vitest-when.ts';
 
+declare module 'vitest' {
+  interface AsymmetricMatchersContaining {
+    toBeFoo(): unknown;
+  }
+}
+
+expect.extend({
+  toBeFoo(received) {
+    return {
+      pass: received === 'foo',
+      message: () => '',
+    };
+  },
+});
+
 const noop = () => null;
 
 describe('vitest-when', () => {
@@ -16,6 +31,10 @@ describe('vitest-when', () => {
 
     subject.when(spy).calledWith(1, 2, 3).thenReturn(4);
 
+    expect(spy()).toEqual(undefined);
+    expect(spy(1)).toEqual(undefined);
+    expect(spy(1, 2)).toEqual(undefined);
+    expect(spy(1, 2, 3, 4)).toEqual(undefined);
     expect(spy(4, 5, 6)).toEqual(undefined);
   });
 
@@ -204,5 +223,24 @@ describe('vitest-when', () => {
     subject.when(spy).calledWith(1, 2, 3).thenReturn(1000);
 
     expect(spy(1, 2, 3)).toEqual(1000);
+  });
+
+  it('should respect asymmetric matchers', () => {
+    const spy = vi.fn();
+
+    subject
+      .when(spy)
+      .calledWith(expect.stringContaining('foo'))
+      .thenReturn(1000);
+
+    expect(spy('foobar')).toEqual(1000);
+  });
+
+  it('should respect custom asymmetric matchers', () => {
+    const spy = vi.fn();
+
+    subject.when(spy).calledWith(expect.toBeFoo()).thenReturn(1000);
+
+    expect(spy('foo')).toEqual(1000);
   });
 });

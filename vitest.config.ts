@@ -5,6 +5,7 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
       exclude: ['example'],
+      reporter: ['text', 'html', 'lcovonly'],
     },
   },
 });

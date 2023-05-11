@@ -1,5 +1,9 @@
 # vitest-when
 
+[![npm badge][]][npm]
+[![ci badge][]][ci]
+[![coverage badge][]][coverage]
+
 Stub behaviors of [vitest][] mocks based on how they are called with a small, readable, and opinionated API. Inspired by [testdouble.js][] and [jest-when][].
 
 ```shell
@@ -9,6 +13,12 @@ npm install --save-dev vitest-when
 [vitest]: https://vitest.dev/
 [testdouble.js]: https://github.com/testdouble/testdouble.js/
 [jest-when]: https://github.com/timkindberg/jest-when
+[npm]: https://npmjs.org/vitest-when
+[npm badge]: https://img.shields.io/npm/v/vitest-when.svg?style=flat-square
+[ci]: https://github.com/mcous/vitest-when/actions
+[ci badge]: https://img.shields.io/github/actions/workflow/status/mcous/vitest-when/ci.yaml?style=flat-square
+[coverage]: https://coveralls.io/github/mcous/vitest-when
+[coverage badge]: https://img.shields.io/coverallsCoverage/github/mcous/vitest-when?style=flat-square
 
 ## Why?
 

@@ -16,6 +16,7 @@
     "src"
   ],
   "publishConfig": {
+    "access": "public",
     "provenance": true
   },
   "packageManager": "pnpm@8.5.0",

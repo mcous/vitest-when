@@ -85,8 +85,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@c3b53f6a16e57305370b4ae5a540c2077a1d50dd
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          registry-url: https://registry.npmjs.org
 
       - name: Download publish artifact
         uses: actions/download-artifact@v3
@@ -95,4 +98,6 @@ jobs:
           path: dist
 
       - name: Publish to npm
-        run: pnpm publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

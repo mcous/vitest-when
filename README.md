@@ -4,7 +4,7 @@
 [![ci badge][]][ci]
 [![coverage badge][]][coverage]
 
-Stub behaviors of [vitest][] mock functions with a small, readable, and opinionated API. Inspired by [testdouble.js][] and [jest-when][].
+Stub behaviors of [Vitest][] mock functions with a small, readable API. Inspired by [testdouble.js][] and [jest-when][].
 
 ```shell
 npm install --save-dev vitest-when
@@ -22,18 +22,18 @@ npm install --save-dev vitest-when
 
 ## Usage
 
-The vitest-when package wraps [Vitest's mock functions][] in a focused, opinionated API that allows you to create [stubs][] - fake objects that have pre-configured responses to matching arguments. With vitest-when, your stubs are:
+Create [stubs][] - fake objects that have pre-configured responses to matching arguments - from [Vitest's mock functions][]. With vitest-when, your stubs are:
 
 - Easy to read
 - Hard to misconfigure, especially when using TypeScript
 
-Wrap your `vi.fn()` mock (or a function imported from a `vi.mock`'d module), in [`when`][when] and match on a set of arguments using [`calledWith`][called-with]. Then, configure a behavior:
+Wrap your `vi.fn()` mock - or a function imported from a `vi.mock`'d module - in [`when`][when], match on a set of arguments using [`calledWith`][called-with], and configure a behavior
 
-- Return a value: [`when(...).calledWith(...).thenReturn(...)`][then-return]
-- Resolve a `Promise`: [`when(...).calledWith(...).thenResolve(...)`][then-resolve]
-- Throw an error: [`when(...).calledWith(...).thenThrow(...)`][then-throw]
-- Reject a `Promise`: [`when(...).calledWith(...).thenReject(...)`][then-reject]
-- Trigger a function: [`when(...).calledWith(...).thenDo(...)`][then-do]
+- [`.thenReturn()`][then-return] - Return a value
+- [`.thenResolve()`][then-resolve] - Resolve a `Promise`
+- [`.thenThrow()`][then-throw] - Throw an error
+- [`.thenReject()`][then-reject] - Reject a `Promise`
+- [`.thenDo()`][then-do] - Trigger a function
 
 If the stub is called with arguments that match `calledWith`, the configured behavior will occur. If the arguments do not match, the stub will no-op and return `undefined`.
 
@@ -47,17 +47,22 @@ afterEach(() => {
 
 test('stubbing with vitest-when', () => {
   const stub = vi.fn();
-  when(stub).calledWith(1, 2, 3).thenReturn(4);
 
-  const result = stub(1, 2, 3);
+  when(stub).calledWith(1, 2, 3).thenReturn(4);
+  when(stub).calledWith(4, 5, 6).thenReturn(7);
+
+  const result123 = stub(1, 2, 3);
   expect(result).toBe(4);
 
-  const result = stub(4, 5, 6);
+  const result456 = stub(4, 5, 6);
+  expect(result).toBe(7);
+
+  const result789 = stub(7, 8, 9);
   expect(result).toBe(undefined);
 });
 ```
 
-You should call `vi.resetAllMocks()` in your suite's `afterEach` hook to remove the implementation added by `when`. You can also set the [`mockReset`](https://vitest.dev/config/#mockreset) config to `true` instead of using `afterEach`.
+You should call `vi.resetAllMocks()` in your suite's `afterEach` hook to remove the implementation added by `when`. You can also set Vitest's [`mockReset`](https://vitest.dev/config/#mockreset) config to `true` instead of using `afterEach`.
 
 [vitest's mock functions]: https://vitest.dev/api/mock.html
 [stubs]: https://en.wikipedia.org/wiki/Test_stub
@@ -75,7 +80,7 @@ Vitest's mock functions are powerful, but have an overly permissive API, inherit
 
 - Mock usage is spread across the [arrange and assert][] phases of your test, with "act" in between, making the test harder to read.
 - If you forget the `expect(...).toHaveBeenCalledWith(...)` step, the test will pass even if the mock is called incorrectly.
-- `expect(...).toHaveBeenCalledWith(...)` is not type-checked, as of vitest `0.31.0`.
+- `expect(...).toHaveBeenCalledWith(...)` is not type-checked, as of Vitest `0.31.0`.
 
 ```ts
 // arrange
@@ -140,7 +145,9 @@ describe('get the meaning of life', () => {
     expect(result).toEqual({ question: "What's 6 by 9?", answer: 42 });
   });
 });
+```
 
+```ts
 // meaning-of-life.ts
 import { calculateAnswer } from './deep-thought.ts';
 import { calculateQuestion } from './earth.ts';
@@ -156,12 +163,16 @@ export const createMeaning = async (): Promise<Meaning> => {
 
   return { question, answer };
 };
+```
 
+```ts
 // deep-thought.ts
 export const calculateAnswer = async (): Promise<number> => {
   throw new Error(`calculateAnswer() not implemented`);
 };
+```
 
+```ts
 // earth.ts
 export const calculateQuestion = async (answer: number): Promise<string> => {
   throw new Error(`calculateQuestion(${answer}) not implemented`);
@@ -175,6 +186,7 @@ export const calculateQuestion = async (answer: number): Promise<string> => {
 Configures a `vi.fn()` mock function to act as a vitest-when stub. Adds an implementation to the function that initially no-ops, and returns an API to configure behaviors for given arguments using [`.calledWith(...)`][called-with]
 
 ```ts
+import { vi } from 'vitest';
 import { when } from 'vitest-when';
 
 const spy = vi.fn();
@@ -194,7 +206,7 @@ const stub = when(spy).calledWith('hello').thenReturn('world');
 expect(spy('hello')).toEqual('world');
 ```
 
-When a call to a mock uses arguments that match those given to `calledWith`, a configured behavior will be triggered. All arguments must match, but you can use vitest's [asymmetric matchers][] to loosen the stubbing:
+When a call to a mock uses arguments that match those given to `calledWith`, a configured behavior will be triggered. All arguments must match, but you can use Vitest's [asymmetric matchers][] to loosen the stubbing:
 
 ```ts
 const spy = vi.fn();

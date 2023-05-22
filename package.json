@@ -1,7 +1,7 @@
 {
   "name": "vitest-when",
   "version": "0.1.1",
-  "description": "Stub behaviors of vitest mocks based on how they are called",
+  "description": "Stub behaviors of vitest mock functions with a small, readable, and opinionated API.",
   "type": "module",
   "exports": {
     ".": {
@@ -43,6 +43,7 @@
     "coverage": "vitest run --coverage",
     "check:format": "pnpm run _prettier --check",
     "check:lint": "pnpm run _eslint",
+    "check:types": "vitest typecheck --run",
     "format": "pnpm run _prettier --write && pnpm run _eslint --fix",
     "_eslint": "eslint --ignore-path .lintignore \"**/*.ts\"",
     "_prettier": "prettier --ignore-path .lintignore \"**/*.@(ts|json|yaml)\""

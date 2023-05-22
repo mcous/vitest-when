@@ -243,4 +243,15 @@ describe('vitest-when', () => {
 
     expect(spy('foo')).toEqual(1000);
   });
+
+  it('should deeply check object arguments', () => {
+    const spy = vi.fn();
+
+    subject
+      .when(spy)
+      .calledWith({ foo: { bar: { baz: 0 } } })
+      .thenReturn(100);
+
+    expect(spy({ foo: { bar: { baz: 0 } } })).toEqual(100);
+  });
 });

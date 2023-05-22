@@ -1,28 +1,53 @@
 import { equals } from '@vitest/expect';
+import type {
+  AnyFunction,
+  AllParameters,
+  ReturnTypeFromArgs,
+} from './types.ts';
 
-export interface BehaviorEntry<TArgs extends unknown[], TReturn> {
+export const ONCE = Symbol('ONCE');
+
+export type StubValue<TValue> = TValue | typeof ONCE;
+
+export interface BehaviorStack<TFunc extends AnyFunction> {
+  use: (
+    args: AllParameters<TFunc>
+  ) => BehaviorEntry<AllParameters<TFunc>> | undefined;
+
+  bindArgs: <TArgs extends AllParameters<TFunc>>(
+    args: TArgs
+  ) => BoundBehaviorStack<ReturnTypeFromArgs<TFunc, TArgs>>;
+}
+
+export interface BoundBehaviorStack<TReturn> {
+  addReturn: (values: StubValue<TReturn>[]) => void;
+  addResolve: (values: StubValue<Awaited<TReturn>>[]) => void;
+  addThrow: (values: StubValue<unknown>[]) => void;
+  addReject: (values: StubValue<unknown>[]) => void;
+  addDo: (values: StubValue<AnyFunction>[]) => void;
+}
+
+export interface BehaviorEntry<TArgs extends unknown[]> {
   args: TArgs;
-  returnValue?: TReturn;
+  returnValue?: unknown;
   throwError?: unknown | undefined;
-  doCallback?: ((...args: TArgs) => TReturn) | undefined;
+  doCallback?: AnyFunction | undefined;
   times?: number | undefined;
 }
 
-export interface Behaviors<TArgs extends unknown[], TReturn> {
-  add: (behaviors: BehaviorEntry<TArgs, TReturn>[]) => void;
-  execute: (args: TArgs) => TReturn;
+export interface BehaviorOptions<TValue> {
+  value: TValue;
+  times: number | undefined;
 }
 
-export const createBehaviors = <TArgs extends unknown[], TReturn>(): Behaviors<
-  TArgs,
-  TReturn
-> => {
-  const behaviorStack: BehaviorEntry<TArgs, TReturn>[] = [];
+export const createBehaviorStack = <
+  TFunc extends AnyFunction
+>(): BehaviorStack<TFunc> => {
+  const behaviors: BehaviorEntry<AllParameters<TFunc>>[] = [];
 
   return {
-    add: (behaviors) => behaviorStack.unshift(...behaviors),
-    execute: (args) => {
-      const behavior = behaviorStack
+    use: (args) => {
+      const behavior = behaviors
         .filter((b) => behaviorAvailable(b))
         .find(behaviorHasArgs(args));
 
@@ -30,27 +55,83 @@ export const createBehaviors = <TArgs extends unknown[], TReturn>(): Behaviors<
         behavior.times -= 1;
       }
 
-      if (behavior?.throwError) {
-        throw behavior.throwError as Error;
-      }
-
-      if (behavior?.doCallback) {
-        return behavior.doCallback(...args);
-      }
-
-      return behavior?.returnValue as TReturn;
+      return behavior;
     },
+
+    bindArgs: (args) => ({
+      addReturn: (values) => {
+        behaviors.unshift(
+          ...getBehaviorOptions(values).map(({ value, times }) => ({
+            args,
+            times,
+            returnValue: value,
+          }))
+        );
+      },
+      addResolve: (values) => {
+        behaviors.unshift(
+          ...getBehaviorOptions(values).map(({ value, times }) => ({
+            args,
+            times,
+            returnValue: Promise.resolve(value),
+          }))
+        );
+      },
+      addThrow: (values) => {
+        behaviors.unshift(
+          ...getBehaviorOptions(values).map(({ value, times }) => ({
+            args,
+            times,
+            throwError: value,
+          }))
+        );
+      },
+      addReject: (values) => {
+        behaviors.unshift(
+          ...getBehaviorOptions(values).map(({ value, times }) => ({
+            args,
+            times,
+            returnValue: Promise.reject(value),
+          }))
+        );
+      },
+      addDo: (values) => {
+        behaviors.unshift(
+          ...getBehaviorOptions(values).map(({ value, times }) => ({
+            args,
+            times,
+            doCallback: value,
+          }))
+        );
+      },
+    }),
   };
 };
 
-const behaviorAvailable = <TArgs extends unknown[], TReturn>(
-  behavior: BehaviorEntry<TArgs, TReturn>
+const getBehaviorOptions = <TValue>(
+  valuesAndOptions: StubValue<TValue>[]
+): BehaviorOptions<TValue>[] => {
+  const once = valuesAndOptions.includes(ONCE);
+  let values = valuesAndOptions.filter((value) => value !== ONCE) as TValue[];
+
+  if (values.length === 0) {
+    values = [undefined as TValue];
+  }
+
+  return values.map((value, i) => ({
+    value,
+    times: once || i < values.length - 1 ? 1 : undefined,
+  }));
+};
+
+const behaviorAvailable = <TArgs extends unknown[]>(
+  behavior: BehaviorEntry<TArgs>
 ): boolean => {
   return behavior.times === undefined || behavior.times > 0;
 };
 
-const behaviorHasArgs = <TArgs extends unknown[], TReturn>(args: TArgs) => {
-  return (behavior: BehaviorEntry<TArgs, TReturn>): boolean => {
+const behaviorHasArgs = <TArgs extends unknown[]>(args: TArgs) => {
+  return (behavior: BehaviorEntry<TArgs>): boolean => {
     let i = 0;
 
     while (i < args.length || i < behavior.args.length) {

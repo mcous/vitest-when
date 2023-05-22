@@ -1,7 +1,7 @@
 {
   "name": "vitest-when",
   "version": "0.1.1",
-  "description": "Stub behaviors of vitest mocks based on how they are called",
+  "description": "Stub behaviors of Vitest mock functions with a small, readable API.",
   "type": "module",
   "exports": {
     ".": {
@@ -19,7 +19,7 @@
     "access": "public",
     "provenance": true
   },
-  "packageManager": "pnpm@8.5.0",
+  "packageManager": "pnpm@8.5.1",
   "author": "Michael Cousins <michael@cousins.io> (https://mike.cousins.io)",
   "license": "MIT",
   "repository": {
@@ -43,6 +43,7 @@
     "coverage": "vitest run --coverage",
     "check:format": "pnpm run _prettier --check",
     "check:lint": "pnpm run _eslint",
+    "check:types": "vitest typecheck --run",
     "format": "pnpm run _prettier --write && pnpm run _eslint --fix",
     "_eslint": "eslint --ignore-path .lintignore \"**/*.ts\"",
     "_prettier": "prettier --ignore-path .lintignore \"**/*.@(ts|json|yaml)\""

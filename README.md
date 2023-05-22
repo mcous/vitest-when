@@ -4,7 +4,7 @@
 [![ci badge][]][ci]
 [![coverage badge][]][coverage]
 
-Stub behaviors of [vitest][] mocks based on how they are called with a small, readable, and opinionated API. Inspired by [testdouble.js][] and [jest-when][].
+Stub behaviors of [Vitest][] mock functions with a small, readable API. Inspired by [testdouble.js][] and [jest-when][].
 
 ```shell
 npm install --save-dev vitest-when
@@ -20,28 +20,100 @@ npm install --save-dev vitest-when
 [coverage]: https://coveralls.io/github/mcous/vitest-when
 [coverage badge]: https://img.shields.io/coverallsCoverage/github/mcous/vitest-when?style=flat-square
 
-## Why?
-
-[Vitest mock functions][] are powerful, but have an overly permissive API, inherited from Jest. This API makes it hard to use mocks to their full potential of providing meaningful design feedback while writing tests.
-
-- It's easy to make silly mistakes, like mocking a return value without checking the arguments.
-- Mock usage requires calls in both the [arrange and assert][] phases a test (e.g. configure return value, assert called with proper arguments), which harms test readability and maintainability.
-
-To avoid these issues, vitest-when wraps vitest mocks in a focused, opinionated API that allows you to configure mock behaviors if and only if they are called as you expect.
-
-[vitest mock functions]: https://vitest.dev/api/mock.html#mockreset
-[arrange and assert]: https://github.com/testdouble/contributing-tests/wiki/Arrange-Act-Assert
-
 ## Usage
 
-0. Add `vi.resetAllMocks` to your suite's `afterEach` hook
-1. Use `when(mock).calledWith(...)` to specify matching arguments
-2. Configure a behavior with a stub method:
-   - Return a value: `.thenReturn(...)`
-   - Resolve a `Promise`: `.thenResolve(...)`
-   - Throw an error: `.thenThrow(...)`
-   - Reject a `Promise`: `.thenReject(...)`
-   - Trigger a callback: `.thenDo(...)`
+Create [stubs][] - fake objects that have pre-configured responses to matching arguments - from [Vitest's mock functions][]. With vitest-when, your stubs are:
+
+- Easy to read
+- Hard to misconfigure, especially when using TypeScript
+
+Wrap your `vi.fn()` mock - or a function imported from a `vi.mock`'d module - in [`when`][when], match on a set of arguments using [`calledWith`][called-with], and configure a behavior
+
+- [`.thenReturn()`][then-return] - Return a value
+- [`.thenResolve()`][then-resolve] - Resolve a `Promise`
+- [`.thenThrow()`][then-throw] - Throw an error
+- [`.thenReject()`][then-reject] - Reject a `Promise`
+- [`.thenDo()`][then-do] - Trigger a function
+
+If the stub is called with arguments that match `calledWith`, the configured behavior will occur. If the arguments do not match, the stub will no-op and return `undefined`.
+
+```ts
+import { vi, test, afterEach } from 'vitest';
+import { when } from '';
+
+afterEach(() => {
+  vi.resetAllMocks();
+});
+
+test('stubbing with vitest-when', () => {
+  const stub = vi.fn();
+
+  when(stub).calledWith(1, 2, 3).thenReturn(4);
+  when(stub).calledWith(4, 5, 6).thenReturn(7);
+
+  const result123 = stub(1, 2, 3);
+  expect(result).toBe(4);
+
+  const result456 = stub(4, 5, 6);
+  expect(result).toBe(7);
+
+  const result789 = stub(7, 8, 9);
+  expect(result).toBe(undefined);
+});
+```
+
+You should call `vi.resetAllMocks()` in your suite's `afterEach` hook to remove the implementation added by `when`. You can also set Vitest's [`mockReset`](https://vitest.dev/config/#mockreset) config to `true` instead of using `afterEach`.
+
+[vitest's mock functions]: https://vitest.dev/api/mock.html
+[stubs]: https://en.wikipedia.org/wiki/Test_stub
+[when]: #whenspy-tfunc-stubwrappertfunc
+[called-with]: #calledwithargs-targs-stubtargs-treturn
+[then-return]: #thenreturnvalue-treturn
+[then-resolve]: #thenresolvevalue-treturn
+[then-throw]: #thenthrowerror-unknown
+[then-reject]: #thenrejecterror-unknown
+[then-do]: #thendocallback-args-targs--treturn
+
+### Why not vanilla Vitest mocks?
+
+Vitest's mock functions are powerful, but have an overly permissive API, inherited from Jest. Vanilla `vi.fn()` mock functions are difficult to use well and easy to use poorly.
+
+- Mock usage is spread across the [arrange and assert][] phases of your test, with "act" in between, making the test harder to read.
+- If you forget the `expect(...).toHaveBeenCalledWith(...)` step, the test will pass even if the mock is called incorrectly.
+- `expect(...).toHaveBeenCalledWith(...)` is not type-checked, as of Vitest `0.31.0`.
+
+```ts
+// arrange
+const stub = vi.fn();
+stub.mockReturnValue('world');
+
+// act
+const result = stub('hello');
+
+// assert
+expect(stub).toHaveBeenCalledWith('hello');
+expect(result).toBe('world');
+```
+
+In contrast, when using vitest-when stubs:
+
+- All stub configuration happens in the "arrange" phase of your test.
+- You cannot forget `calledWith`.
+- `calledWith` and `thenReturn` (et. al.) are fully type-checked.
+
+```ts
+// arrange
+const stub = vi.fn();
+when(stub).calledWith('hello').thenReturn('world');
+
+// act
+const result = stub('hello');
+
+// assert
+expect(result).toBe('world');
+```
+
+[arrange and assert]: https://github.com/testdouble/contributing-tests/wiki/Arrange-Act-Assert
 
 ### Example
 
@@ -59,12 +131,12 @@ import * as subject from './meaning-of-life.ts';
 vi.mock('./deep-thought.ts');
 vi.mock('./earth.ts');
 
-describe('subject under test', () => {
+describe('get the meaning of life', () => {
   afterEach(() => {
     vi.resetAllMocks();
   });
 
-  it('should delegate work to dependency', async () => {
+  it('should get the answer and the question', async () => {
     when(deepThought.calculateAnswer).calledWith().thenResolve(42);
     when(earth.calculateQuestion).calledWith(42).thenResolve("What's 6 by 9?");
 
@@ -73,7 +145,9 @@ describe('subject under test', () => {
     expect(result).toEqual({ question: "What's 6 by 9?", answer: 42 });
   });
 });
+```
 
+```ts
 // meaning-of-life.ts
 import { calculateAnswer } from './deep-thought.ts';
 import { calculateQuestion } from './earth.ts';
@@ -89,12 +163,16 @@ export const createMeaning = async (): Promise<Meaning> => {
 
   return { question, answer };
 };
+```
 
+```ts
 // deep-thought.ts
 export const calculateAnswer = async (): Promise<number> => {
   throw new Error(`calculateAnswer() not implemented`);
 };
+```
 
+```ts
 // earth.ts
 export const calculateQuestion = async (answer: number): Promise<string> => {
   throw new Error(`calculateQuestion(${answer}) not implemented`);
@@ -103,19 +181,32 @@ export const calculateQuestion = async (answer: number): Promise<string> => {
 
 ## API
 
-### `when(spy: Mock<TArgs, TReturn>).calledWith(...args: TArgs): Stub<TArgs, TReturn>`
+### `when(spy: TFunc): StubWrapper<TFunc>`
 
-Create's a stub for a given set of arguments that you can then configure with different behaviors.
+Configures a `vi.fn()` mock function to act as a vitest-when stub. Adds an implementation to the function that initially no-ops, and returns an API to configure behaviors for given arguments using [`.calledWith(...)`][called-with]
+
+```ts
+import { vi } from 'vitest';
+import { when } from 'vitest-when';
+
+const spy = vi.fn();
+const stubWrapper = when(spy);
+
+expect(spy()).toBe(undefined);
+```
+
+### `.calledWith(...args: TArgs): Stub<TArgs, TReturn>`
+
+Create a stub that matches a given set of arguments which you can configure with different behaviors using methods like [`.thenReturn(...)`][then-return].
 
 ```ts
 const spy = vi.fn();
-
-when(spy).calledWith('hello').thenReturn('world');
+const stub = when(spy).calledWith('hello').thenReturn('world');
 
 expect(spy('hello')).toEqual('world');
 ```
 
-When a call to a mock uses arguments that match those given to `calledWith`, a configured behavior will be triggered. All arguments must match, though you can use vitest's [asymmetric matchers][] to loosen the stubbing:
+When a call to a mock uses arguments that match those given to `calledWith`, a configured behavior will be triggered. All arguments must match, but you can use Vitest's [asymmetric matchers][] to loosen the stubbing:
 
 ```ts
 const spy = vi.fn();
@@ -338,10 +429,3 @@ when(spy)
 expect(spy('hello')).toEqual('world');
 expect(spy('hello')).toEqual('solar system');
 ```
-
-## See also
-
-- [testdouble-vitest][] - Use [testdouble.js][] mocks with Vitest instead of the default [tinyspy][] mocks.
-
-[testdouble-vitest]: https://github.com/mcous/testdouble-vitest
-[tinyspy]: https://github.com/tinylibs/tinyspy

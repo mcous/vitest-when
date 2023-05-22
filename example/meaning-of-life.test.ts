@@ -8,12 +8,12 @@ import * as subject from './meaning-of-life.ts';
 vi.mock('./deep-thought.ts');
 vi.mock('./earth.ts');
 
-describe('subject under test', () => {
+describe('get the meaning of life', () => {
   afterEach(() => {
     vi.resetAllMocks();
   });
 
-  it('should delegate work to dependency', async () => {
+  it('should get the answer and the question', async () => {
     when(deepThought.calculateAnswer).calledWith().thenResolve(42);
     when(earth.calculateQuestion).calledWith(42).thenResolve("What's 6 by 9?");
 

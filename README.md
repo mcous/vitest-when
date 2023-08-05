@@ -51,13 +51,13 @@ test('stubbing with vitest-when', () => {
   when(stub).calledWith(1, 2, 3).thenReturn(4);
   when(stub).calledWith(4, 5, 6).thenReturn(7);
 
-  const result123 = stub(1, 2, 3);
+  let result = stub(1, 2, 3);
   expect(result).toBe(4);
 
-  const result456 = stub(4, 5, 6);
+  result = stub(4, 5, 6);
   expect(result).toBe(7);
 
-  const result789 = stub(7, 8, 9);
+  result = stub(7, 8, 9);
   expect(result).toBe(undefined);
 });
 ```
@@ -190,7 +190,8 @@ import { vi } from 'vitest';
 import { when } from 'vitest-when';
 
 const spy = vi.fn();
-const stubWrapper = when(spy);
+
+when(spy);
 
 expect(spy()).toBe(undefined);
 ```
@@ -201,7 +202,8 @@ Create a stub that matches a given set of arguments which you can configure with
 
 ```ts
 const spy = vi.fn();
-const stub = when(spy).calledWith('hello').thenReturn('world');
+
+when(spy).calledWith('hello').thenReturn('world');
 
 expect(spy('hello')).toEqual('world');
 ```
@@ -220,10 +222,10 @@ expect(spy('anything')).toEqual('world');
 If `calledWith` is used multiple times, the last configured stubbing will be used.
 
 ```ts
-when(spy).calledWith("hello").thenReturn("world")
-expect(spy("hello")).toEqual("world")
-when(spy).calledWith("hello").thenReturn("goodbye"
-expect(spy("hello")).toEqual("goodbye")
+when(spy).calledWith('hello').thenReturn('world');
+expect(spy('hello')).toEqual('world');
+when(spy).calledWith('hello').thenReturn('goodbye');
+expect(spy('hello')).toEqual('goodbye');
 ```
 
 [asymmetric matchers]: https://vitest.dev/api/expect.html#expect-anything

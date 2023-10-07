@@ -241,12 +241,13 @@ function overloaded(input?: number): string | null {
   // ...
 }
 
-// $ts-expect-error:
-// - Expected 1 argument, but got 0.
-// - Argument of type 'null' is not assignable to parameter of type 'StubValue<string>'.
+// Last entry: all good!
+when(overloaded).calledWith(42).thenReturn('hello');
+
+// $ts-expect-error: first entry
 subject.when(overloaded).calledWith().thenReturn(null);
 
-// all good!
+// Manually specified: all good!
 when<() => null>(overloaded).calledWith().thenReturn(null);
 ```
 

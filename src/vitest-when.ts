@@ -1,18 +1,14 @@
 import { configureStub } from './stubs.ts';
 import type { StubValue } from './behaviors.ts';
-import type {
-  AnyFunction,
-  AllParameters,
-  ReturnTypeFromArgs,
-} from './types.ts';
+import type { AnyFunction } from './types.ts';
 
 export { ONCE, type StubValue } from './behaviors.ts';
 export * from './errors.ts';
 
 export interface StubWrapper<TFunc extends AnyFunction> {
-  calledWith<TArgs extends AllParameters<TFunc>>(
+  calledWith<TArgs extends Parameters<TFunc>>(
     ...args: TArgs
-  ): Stub<TArgs, ReturnTypeFromArgs<TFunc, TArgs>>;
+  ): Stub<TArgs, ReturnType<TFunc>>;
 }
 
 export interface Stub<TArgs extends unknown[], TReturn> {

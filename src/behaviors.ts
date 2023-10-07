@@ -1,9 +1,5 @@
 import { equals } from '@vitest/expect';
-import type {
-  AnyFunction,
-  AllParameters,
-  ReturnTypeFromArgs,
-} from './types.ts';
+import type { AnyFunction } from './types.ts';
 
 export const ONCE = Symbol('ONCE');
 
@@ -11,12 +7,12 @@ export type StubValue<TValue> = TValue | typeof ONCE;
 
 export interface BehaviorStack<TFunc extends AnyFunction> {
   use: (
-    args: AllParameters<TFunc>
-  ) => BehaviorEntry<AllParameters<TFunc>> | undefined;
+    args: Parameters<TFunc>
+  ) => BehaviorEntry<Parameters<TFunc>> | undefined;
 
-  bindArgs: <TArgs extends AllParameters<TFunc>>(
+  bindArgs: <TArgs extends Parameters<TFunc>>(
     args: TArgs
-  ) => BoundBehaviorStack<ReturnTypeFromArgs<TFunc, TArgs>>;
+  ) => BoundBehaviorStack<ReturnType<TFunc>>;
 }
 
 export interface BoundBehaviorStack<TReturn> {
@@ -43,7 +39,7 @@ export interface BehaviorOptions<TValue> {
 export const createBehaviorStack = <
   TFunc extends AnyFunction
 >(): BehaviorStack<TFunc> => {
-  const behaviors: BehaviorEntry<AllParameters<TFunc>>[] = [];
+  const behaviors: BehaviorEntry<Parameters<TFunc>>[] = [];
 
   return {
     use: (args) => {

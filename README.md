@@ -230,6 +230,20 @@ expect(spy('hello')).toEqual('goodbye');
 
 [asymmetric matchers]: https://vitest.dev/api/expect.html#expect-anything
 
+#### Types of overloaded functions
+
+Due to fundamental limitations of how TypeScript handles the types of overloaded functions, `when` will always pick the _last_ overload as the type of `TFunc`. You can use the `TFunc` type argument of when to customize this if you're stubbing a different overload:
+
+```ts
+function overloaded(): null;
+function overloaded(input: number): string;
+function overloaded(input?: number): string | null {
+  // ...
+}
+
+when<() => null>(overloaded).calledWith().thenReturn(null);
+```
+
 ### `.thenReturn(value: TReturn)`
 
 When the stubbing is satisfied, return `value`

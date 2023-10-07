@@ -245,7 +245,7 @@ function overloaded(input?: number): string | null {
 when(overloaded).calledWith(42).thenReturn('hello');
 
 // $ts-expect-error: first entry
-subject.when(overloaded).calledWith().thenReturn(null);
+when(overloaded).calledWith().thenReturn(null);
 
 // Manually specified: all good!
 when<() => null>(overloaded).calledWith().thenReturn(null);

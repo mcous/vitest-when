@@ -232,7 +232,7 @@ expect(spy('hello')).toEqual('goodbye');
 
 #### Types of overloaded functions
 
-Due to fundamental limitations of how TypeScript handles the types of overloaded functions, `when` will always pick the _last_ overload as the type of `TFunc`. You can use the `TFunc` type argument of when to customize this if you're stubbing a different overload:
+Due to fundamental limitations in TypeScript, `when()` will always use the _last_ overload to infer function parameters and return types. You can use the `TFunc` type parameter of `when()` to manually select a different overload entry:
 
 ```ts
 function overloaded(): null;
@@ -241,6 +241,12 @@ function overloaded(input?: number): string | null {
   // ...
 }
 
+// $ts-expect-error:
+// - Expected 1 argument, but got 0.
+// - Argument of type 'null' is not assignable to parameter of type 'StubValue<string>'.
+subject.when(overloaded).calledWith().thenReturn(null);
+
+// all good!
 when<() => null>(overloaded).calledWith().thenReturn(null);
 ```
 

@@ -1,6 +1,6 @@
 {
   "name": "vitest-when",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Stub behaviors of Vitest mock functions with a small, readable API.",
   "keywords": [
     "tdd",

@@ -38,28 +38,28 @@ Wrap your `vi.fn()` mock - or a function imported from a `vi.mock`'d module - in
 If the stub is called with arguments that match `calledWith`, the configured behavior will occur. If the arguments do not match, the stub will no-op and return `undefined`.
 
 ```ts
-import { vi, test, afterEach } from 'vitest';
-import { when } from '';
+import { vi, test, afterEach } from 'vitest'
+import { when } from ''
 
 afterEach(() => {
-  vi.resetAllMocks();
-});
+  vi.resetAllMocks()
+})
 
 test('stubbing with vitest-when', () => {
-  const stub = vi.fn();
+  const stub = vi.fn()
 
-  when(stub).calledWith(1, 2, 3).thenReturn(4);
-  when(stub).calledWith(4, 5, 6).thenReturn(7);
+  when(stub).calledWith(1, 2, 3).thenReturn(4)
+  when(stub).calledWith(4, 5, 6).thenReturn(7)
 
-  let result = stub(1, 2, 3);
-  expect(result).toBe(4);
+  let result = stub(1, 2, 3)
+  expect(result).toBe(4)
 
-  result = stub(4, 5, 6);
-  expect(result).toBe(7);
+  result = stub(4, 5, 6)
+  expect(result).toBe(7)
 
-  result = stub(7, 8, 9);
-  expect(result).toBe(undefined);
-});
+  result = stub(7, 8, 9)
+  expect(result).toBe(undefined)
+})
 ```
 
 You should call `vi.resetAllMocks()` in your suite's `afterEach` hook to remove the implementation added by `when`. You can also set Vitest's [`mockReset`](https://vitest.dev/config/#mockreset) config to `true` instead of using `afterEach`.
@@ -84,15 +84,15 @@ Vitest's mock functions are powerful, but have an overly permissive API, inherit
 
 ```ts
 // arrange
-const stub = vi.fn();
-stub.mockReturnValue('world');
+const stub = vi.fn()
+stub.mockReturnValue('world')
 
 // act
-const result = stub('hello');
+const result = stub('hello')
 
 // assert
-expect(stub).toHaveBeenCalledWith('hello');
-expect(result).toBe('world');
+expect(stub).toHaveBeenCalledWith('hello')
+expect(result).toBe('world')
 ```
 
 In contrast, when using vitest-when stubs:
@@ -103,14 +103,14 @@ In contrast, when using vitest-when stubs:
 
 ```ts
 // arrange
-const stub = vi.fn();
-when(stub).calledWith('hello').thenReturn('world');
+const stub = vi.fn()
+when(stub).calledWith('hello').thenReturn('world')
 
 // act
-const result = stub('hello');
+const result = stub('hello')
 
 // assert
-expect(result).toBe('world');
+expect(result).toBe('world')
 ```
 
 [arrange and assert]: https://github.com/testdouble/contributing-tests/wiki/Arrange-Act-Assert
@@ -121,62 +121,62 @@ See the [./example](./example) directory for example usage.
 
 ```ts
 // meaning-of-life.test.ts
-import { vi, describe, afterEach, it, expect } from 'vitest';
-import { when } from '../src/vitest-when.ts';
+import { vi, describe, afterEach, it, expect } from 'vitest'
+import { when } from '../src/vitest-when.ts'
 
-import * as deepThought from './deep-thought.ts';
-import * as earth from './earth.ts';
-import * as subject from './meaning-of-life.ts';
+import * as deepThought from './deep-thought.ts'
+import * as earth from './earth.ts'
+import * as subject from './meaning-of-life.ts'
 
-vi.mock('./deep-thought.ts');
-vi.mock('./earth.ts');
+vi.mock('./deep-thought.ts')
+vi.mock('./earth.ts')
 
 describe('get the meaning of life', () => {
   afterEach(() => {
-    vi.resetAllMocks();
-  });
+    vi.resetAllMocks()
+  })
 
   it('should get the answer and the question', async () => {
-    when(deepThought.calculateAnswer).calledWith().thenResolve(42);
-    when(earth.calculateQuestion).calledWith(42).thenResolve("What's 6 by 9?");
+    when(deepThought.calculateAnswer).calledWith().thenResolve(42)
+    when(earth.calculateQuestion).calledWith(42).thenResolve("What's 6 by 9?")
 
-    const result = await subject.createMeaning();
+    const result = await subject.createMeaning()
 
-    expect(result).toEqual({ question: "What's 6 by 9?", answer: 42 });
-  });
-});
+    expect(result).toEqual({ question: "What's 6 by 9?", answer: 42 })
+  })
+})
 ```
 
 ```ts
 // meaning-of-life.ts
-import { calculateAnswer } from './deep-thought.ts';
-import { calculateQuestion } from './earth.ts';
+import { calculateAnswer } from './deep-thought.ts'
+import { calculateQuestion } from './earth.ts'
 
 export interface Meaning {
-  question: string;
-  answer: number;
+  question: string
+  answer: number
 }
 
 export const createMeaning = async (): Promise<Meaning> => {
-  const answer = await calculateAnswer();
-  const question = await calculateQuestion(answer);
+  const answer = await calculateAnswer()
+  const question = await calculateQuestion(answer)
 
-  return { question, answer };
-};
+  return { question, answer }
+}
 ```
 
 ```ts
 // deep-thought.ts
 export const calculateAnswer = async (): Promise<number> => {
-  throw new Error(`calculateAnswer() not implemented`);
-};
+  throw new Error(`calculateAnswer() not implemented`)
+}
 ```
 
 ```ts
 // earth.ts
 export const calculateQuestion = async (answer: number): Promise<string> => {
-  throw new Error(`calculateQuestion(${answer}) not implemented`);
-};
+  throw new Error(`calculateQuestion(${answer}) not implemented`)
+}
 ```
 
 ## API
@@ -186,14 +186,14 @@ export const calculateQuestion = async (answer: number): Promise<string> => {
 Configures a `vi.fn()` mock function to act as a vitest-when stub. Adds an implementation to the function that initially no-ops, and returns an API to configure behaviors for given arguments using [`.calledWith(...)`][called-with]
 
 ```ts
-import { vi } from 'vitest';
-import { when } from 'vitest-when';
+import { vi } from 'vitest'
+import { when } from 'vitest-when'
 
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy);
+when(spy)
 
-expect(spy()).toBe(undefined);
+expect(spy()).toBe(undefined)
 ```
 
 ### `.calledWith(...args: TArgs): Stub<TArgs, TReturn>`
@@ -201,31 +201,31 @@ expect(spy()).toBe(undefined);
 Create a stub that matches a given set of arguments which you can configure with different behaviors using methods like [`.thenReturn(...)`][then-return].
 
 ```ts
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith('hello').thenReturn('world');
+when(spy).calledWith('hello').thenReturn('world')
 
-expect(spy('hello')).toEqual('world');
+expect(spy('hello')).toEqual('world')
 ```
 
 When a call to a mock uses arguments that match those given to `calledWith`, a configured behavior will be triggered. All arguments must match, but you can use Vitest's [asymmetric matchers][] to loosen the stubbing:
 
 ```ts
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith(expect.any(String)).thenReturn('world');
+when(spy).calledWith(expect.any(String)).thenReturn('world')
 
-expect(spy('hello')).toEqual('world');
-expect(spy('anything')).toEqual('world');
+expect(spy('hello')).toEqual('world')
+expect(spy('anything')).toEqual('world')
 ```
 
 If `calledWith` is used multiple times, the last configured stubbing will be used.
 
 ```ts
-when(spy).calledWith('hello').thenReturn('world');
-expect(spy('hello')).toEqual('world');
-when(spy).calledWith('hello').thenReturn('goodbye');
-expect(spy('hello')).toEqual('goodbye');
+when(spy).calledWith('hello').thenReturn('world')
+expect(spy('hello')).toEqual('world')
+when(spy).calledWith('hello').thenReturn('goodbye')
+expect(spy('hello')).toEqual('goodbye')
 ```
 
 [asymmetric matchers]: https://vitest.dev/api/expect.html#expect-anything
@@ -235,20 +235,20 @@ expect(spy('hello')).toEqual('goodbye');
 Due to fundamental limitations in TypeScript, `when()` will always use the _last_ overload to infer function parameters and return types. You can use the `TFunc` type parameter of `when()` to manually select a different overload entry:
 
 ```ts
-function overloaded(): null;
-function overloaded(input: number): string;
+function overloaded(): null
+function overloaded(input: number): string
 function overloaded(input?: number): string | null {
   // ...
 }
 
 // Last entry: all good!
-when(overloaded).calledWith(42).thenReturn('hello');
+when(overloaded).calledWith(42).thenReturn('hello')
 
 // $ts-expect-error: first entry
-when(overloaded).calledWith().thenReturn(null);
+when(overloaded).calledWith().thenReturn(null)
 
 // Manually specified: all good!
-when<() => null>(overloaded).calledWith().thenReturn(null);
+when<() => null>(overloaded).calledWith().thenReturn(null)
 ```
 
 ### `.thenReturn(value: TReturn)`
@@ -256,36 +256,36 @@ when<() => null>(overloaded).calledWith().thenReturn(null);
 When the stubbing is satisfied, return `value`
 
 ```ts
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith('hello').thenReturn('world');
+when(spy).calledWith('hello').thenReturn('world')
 
-expect(spy('hello')).toEqual('world');
+expect(spy('hello')).toEqual('world')
 ```
 
 To only return a value once, use the `ONCE` option.
 
 ```ts
-import { ONCE, when } from 'vitest-when';
+import { ONCE, when } from 'vitest-when'
 
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith('hello').thenReturn('world', ONCE);
+when(spy).calledWith('hello').thenReturn('world', ONCE)
 
-expect(spy('hello')).toEqual('world');
-expect(spy('hello')).toEqual(undefined);
+expect(spy('hello')).toEqual('world')
+expect(spy('hello')).toEqual(undefined)
 ```
 
 You may pass several values to `thenReturn` to return different values in succession. The last value will be latched, unless you pass the `ONCE` option.
 
 ```ts
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith('hello').thenReturn('hi', 'sup?');
+when(spy).calledWith('hello').thenReturn('hi', 'sup?')
 
-expect(spy('hello')).toEqual('hi');
-expect(spy('hello')).toEqual('sup?');
-expect(spy('hello')).toEqual('sup?');
+expect(spy('hello')).toEqual('hi')
+expect(spy('hello')).toEqual('sup?')
+expect(spy('hello')).toEqual('sup?')
 ```
 
 ### `.thenResolve(value: TReturn)`
@@ -293,36 +293,36 @@ expect(spy('hello')).toEqual('sup?');
 When the stubbing is satisfied, resolve a `Promise` with `value`
 
 ```ts
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith('hello').thenResolve('world');
+when(spy).calledWith('hello').thenResolve('world')
 
-expect(await spy('hello')).toEqual('world');
+expect(await spy('hello')).toEqual('world')
 ```
 
 To only resolve a value once, use the `ONCE` option.
 
 ```ts
-import { ONCE, when } from 'vitest-when';
+import { ONCE, when } from 'vitest-when'
 
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith('hello').thenResolve('world', ONCE);
+when(spy).calledWith('hello').thenResolve('world', ONCE)
 
-expect(await spy('hello')).toEqual('world');
-expect(spy('hello')).toEqual(undefined);
+expect(await spy('hello')).toEqual('world')
+expect(spy('hello')).toEqual(undefined)
 ```
 
 You may pass several values to `thenResolve` to resolve different values in succession. The last value will be latched, unless you pass the `ONCE` option.
 
 ```ts
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith('hello').thenResolve('hi', 'sup?');
+when(spy).calledWith('hello').thenResolve('hi', 'sup?')
 
-expect(await spy('hello')).toEqual('hi');
-expect(await spy('hello')).toEqual('sup?');
-expect(await spy('hello')).toEqual('sup?');
+expect(await spy('hello')).toEqual('hi')
+expect(await spy('hello')).toEqual('sup?')
+expect(await spy('hello')).toEqual('sup?')
 ```
 
 ### `.thenThrow(error: unknown)`
@@ -330,38 +330,38 @@ expect(await spy('hello')).toEqual('sup?');
 When the stubbing is satisfied, throw `error`.
 
 ```ts
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith('hello').thenThrow(new Error('oh no'));
+when(spy).calledWith('hello').thenThrow(new Error('oh no'))
 
-expect(() => spy('hello')).toThrow('oh no');
+expect(() => spy('hello')).toThrow('oh no')
 ```
 
 To only throw an error only once, use the `ONCE` option.
 
 ```ts
-import { ONCE, when } from 'vitest-when';
+import { ONCE, when } from 'vitest-when'
 
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith('hello').thenThrow(new Error('oh no'), ONCE);
+when(spy).calledWith('hello').thenThrow(new Error('oh no'), ONCE)
 
-expect(() => spy('hello')).toThrow('oh no');
-expect(spy('hello')).toEqual(undefined);
+expect(() => spy('hello')).toThrow('oh no')
+expect(spy('hello')).toEqual(undefined)
 ```
 
 You may pass several values to `thenThrow` to throw different errors in succession. The last value will be latched, unless you pass the `ONCE` option.
 
 ```ts
-const spy = vi.fn();
+const spy = vi.fn()
 
 when(spy)
   .calledWith('hello')
-  .thenThrow(new Error('oh no'), new Error('this is bad'));
+  .thenThrow(new Error('oh no'), new Error('this is bad'))
 
-expect(() => spy('hello')).toThrow('oh no');
-expect(() => spy('hello')).toThrow('this is bad');
-expect(() => spy('hello')).toThrow('this is bad');
+expect(() => spy('hello')).toThrow('oh no')
+expect(() => spy('hello')).toThrow('this is bad')
+expect(() => spy('hello')).toThrow('this is bad')
 ```
 
 ### `.thenReject(error: unknown)`
@@ -369,38 +369,38 @@ expect(() => spy('hello')).toThrow('this is bad');
 When the stubbing is satisfied, reject a `Promise` with `error`.
 
 ```ts
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith('hello').thenReject(new Error('oh no'));
+when(spy).calledWith('hello').thenReject(new Error('oh no'))
 
-await expect(spy('hello')).rejects.toThrow('oh no');
+await expect(spy('hello')).rejects.toThrow('oh no')
 ```
 
 To only throw an error only once, use the `ONCE` option.
 
 ```ts
-import { ONCE, when } from 'vitest-when';
+import { ONCE, when } from 'vitest-when'
 
-const spy = vi.fn();
+const spy = vi.fn()
 
-when(spy).calledWith('hello').thenReject(new Error('oh no'), ONCE);
+when(spy).calledWith('hello').thenReject(new Error('oh no'), ONCE)
 
-await expect(spy('hello')).rejects.toThrow('oh no');
-expect(spy('hello')).toEqual(undefined);
+await expect(spy('hello')).rejects.toThrow('oh no')
+expect(spy('hello')).toEqual(undefined)
 ```
 
 You may pass several values to `thenReject` to throw different errors in succession. The last value will be latched, unless you pass the `ONCE` option.
 
 ```ts
-const spy = vi.fn();
+const spy = vi.fn()
 
 when(spy)
   .calledWith('hello')
-  .thenReject(new Error('oh no'), new Error('this is bad'));
+  .thenReject(new Error('oh no'), new Error('this is bad'))
 
-await expect(spy('hello')).rejects.toThrow('oh no');
-await expect(spy('hello')).rejects.toThrow('this is bad');
-await expect(spy('hello')).rejects.toThrow('this is bad');
+await expect(spy('hello')).rejects.toThrow('oh no')
+await expect(spy('hello')).rejects.toThrow('this is bad')
+await expect(spy('hello')).rejects.toThrow('this is bad')
 ```
 
 ### `.thenDo(callback: (...args: TArgs) => TReturn)`
@@ -408,47 +408,47 @@ await expect(spy('hello')).rejects.toThrow('this is bad');
 When the stubbing is satisfied, run `callback` to trigger a side-effect and return its result (if any). `thenDo` is a relatively powerful tool for stubbing complex behaviors, so if you find yourself using `thenDo` often, consider refactoring your code to use more simple interactions! Your future self will thank you.
 
 ```ts
-const spy = vi.fn();
-let called = false;
+const spy = vi.fn()
+let called = false
 
 when(spy)
   .calledWith('hello')
   .thenDo(() => {
-    called = true;
-    return 'world';
-  });
+    called = true
+    return 'world'
+  })
 
-expect(spy('hello')).toEqual('world');
-expect(called).toEqual(true);
+expect(spy('hello')).toEqual('world')
+expect(called).toEqual(true)
 ```
 
 To only run the callback once, use the `ONCE` option.
 
 ```ts
-import { ONCE, when } from 'vitest-when';
+import { ONCE, when } from 'vitest-when'
 
-const spy = vi.fn();
+const spy = vi.fn()
 
 when(spy)
   .calledWith('hello')
-  .thenDo(() => 'world', ONCE);
+  .thenDo(() => 'world', ONCE)
 
-expect(spy('hello')).toEqual('world');
-expect(spy('hello')).toEqual(undefined);
+expect(spy('hello')).toEqual('world')
+expect(spy('hello')).toEqual(undefined)
 ```
 
 You may pass several callbacks to `thenDo` to trigger different side-effects in succession. The last callback will be latched, unless you pass the `ONCE` option.
 
 ```ts
-const spy = vi.fn();
+const spy = vi.fn()
 
 when(spy)
   .calledWith('hello')
   .thenDo(
     () => 'world',
-    () => 'solar system'
-  );
+    () => 'solar system',
+  )
 
-expect(spy('hello')).toEqual('world');
-expect(spy('hello')).toEqual('solar system');
+expect(spy('hello')).toEqual('world')
+expect(spy('hello')).toEqual('solar system')
 ```

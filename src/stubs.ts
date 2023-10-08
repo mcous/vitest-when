@@ -1,53 +1,53 @@
-import type { Mock as Spy } from 'vitest';
-import { createBehaviorStack, type BehaviorStack } from './behaviors.ts';
-import { NotAMockFunctionError } from './errors.ts';
-import type { AnyFunction } from './types.ts';
+import type { Mock as Spy } from 'vitest'
+import { createBehaviorStack, type BehaviorStack } from './behaviors.ts'
+import { NotAMockFunctionError } from './errors.ts'
+import type { AnyFunction } from './types.ts'
 
-const BEHAVIORS_KEY = Symbol('behaviors');
+const BEHAVIORS_KEY = Symbol('behaviors')
 
 interface WhenStubImplementation<TFunc extends AnyFunction> {
-  (...args: Parameters<TFunc>): unknown;
-  [BEHAVIORS_KEY]: BehaviorStack<TFunc>;
+  (...args: Parameters<TFunc>): unknown
+  [BEHAVIORS_KEY]: BehaviorStack<TFunc>
 }
 
 export const configureStub = <TFunc extends AnyFunction>(
-  maybeSpy: unknown
+  maybeSpy: unknown,
 ): BehaviorStack<TFunc> => {
-  const spy = validateSpy<TFunc>(maybeSpy);
+  const spy = validateSpy<TFunc>(maybeSpy)
   const existingImplementation = spy.getMockImplementation() as
     | WhenStubImplementation<TFunc>
     | TFunc
-    | undefined;
+    | undefined
 
   if (existingImplementation && BEHAVIORS_KEY in existingImplementation) {
-    return existingImplementation[BEHAVIORS_KEY];
+    return existingImplementation[BEHAVIORS_KEY]
   }
 
-  const behaviors = createBehaviorStack<TFunc>();
+  const behaviors = createBehaviorStack<TFunc>()
 
   const implementation = (...args: Parameters<TFunc>): unknown => {
-    const behavior = behaviors.use(args);
+    const behavior = behaviors.use(args)
 
     if (behavior?.throwError) {
-      throw behavior.throwError as Error;
+      throw behavior.throwError as Error
     }
 
     if (behavior?.doCallback) {
-      return behavior.doCallback(...args);
+      return behavior.doCallback(...args)
     }
 
-    return behavior?.returnValue;
-  };
+    return behavior?.returnValue
+  }
 
   spy.mockImplementation(
-    Object.assign(implementation, { [BEHAVIORS_KEY]: behaviors })
-  );
+    Object.assign(implementation, { [BEHAVIORS_KEY]: behaviors }),
+  )
 
-  return behaviors;
-};
+  return behaviors
+}
 
 const validateSpy = <TFunc extends AnyFunction>(
-  maybeSpy: unknown
+  maybeSpy: unknown,
 ): Spy<Parameters<TFunc>, unknown> => {
   if (
     typeof maybeSpy === 'function' &&
@@ -56,8 +56,8 @@ const validateSpy = <TFunc extends AnyFunction>(
     'getMockImplementation' in maybeSpy &&
     typeof maybeSpy.getMockImplementation === 'function'
   ) {
-    return maybeSpy as Spy<Parameters<TFunc>, unknown>;
+    return maybeSpy as Spy<Parameters<TFunc>, unknown>
   }
 
-  throw new NotAMockFunctionError(maybeSpy);
-};
+  throw new NotAMockFunctionError(maybeSpy)
+}

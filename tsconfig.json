@@ -1,6 +1,9 @@
 {
-  "extends": "@viamrobotics/typescript-config/base.json",
+  "extends": "@mcous/typescript-config/base.json",
   "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2021",
     "noEmit": true,
     "allowImportingTsExtensions": true
   },

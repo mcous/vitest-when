@@ -1,14 +1,14 @@
-import { calculateAnswer } from './deep-thought.ts';
-import { calculateQuestion } from './earth.ts';
+import { calculateAnswer } from './deep-thought.ts'
+import { calculateQuestion } from './earth.ts'
 
 export interface Meaning {
-  question: string;
-  answer: number;
+  question: string
+  answer: number
 }
 
 export const createMeaning = async (): Promise<Meaning> => {
-  const answer = await calculateAnswer();
-  const question = await calculateQuestion(answer);
+  const answer = await calculateAnswer()
+  const question = await calculateQuestion(answer)
 
-  return { question, answer };
-};
+  return { question, answer }
+}

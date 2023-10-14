@@ -39,7 +39,7 @@ If the stub is called with arguments that match `calledWith`, the configured beh
 
 ```ts
 import { vi, test, afterEach } from 'vitest'
-import { when } from ''
+import { when } from 'vitest-when'
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -122,7 +122,7 @@ See the [./example](./example) directory for example usage.
 ```ts
 // meaning-of-life.test.ts
 import { vi, describe, afterEach, it, expect } from 'vitest'
-import { when } from '../src/vitest-when.ts'
+import { when } from 'vitest-when'
 
 import * as deepThought from './deep-thought.ts'
 import * as earth from './earth.ts'

@@ -5,7 +5,10 @@
     "moduleResolution": "bundler",
     "target": "es2021",
     "noEmit": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "vitest-when": ["./src/vitest-when.ts"]
+    }
   },
   "include": ["vitest.config.ts", "src", "test", "example"]
 }

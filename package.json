@@ -51,21 +51,21 @@
     "extends": "@mcous/eslint-config"
   },
   "devDependencies": {
-    "@mcous/eslint-config": "0.3.3",
+    "@mcous/eslint-config": "0.4.1",
     "@mcous/prettier-config": "0.3.0",
     "@mcous/typescript-config": "0.2.1",
-    "@typescript-eslint/eslint-plugin": "6.7.4",
-    "@typescript-eslint/parser": "6.7.4",
+    "@typescript-eslint/eslint-plugin": "6.10.0",
+    "@typescript-eslint/parser": "6.10.0",
     "@vitest/coverage-istanbul": "^1.0.0-beta.4",
     "@vitest/expect": "^1.0.0-beta.4",
-    "concurrently": "^8.0.1",
-    "eslint": "8.51.0",
+    "concurrently": "^8.2.2",
+    "eslint": "8.53.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-promise": "6.1.1",
     "eslint-plugin-sonarjs": "0.21.0",
-    "eslint-plugin-unicorn": "48.0.1",
+    "eslint-plugin-unicorn": "49.0.0",
     "prettier": "3.0.3",
-    "tsup": "^6.7.0",
+    "tsup": "^7.2.0",
     "typescript": "5.2.2",
     "vitest": "^1.0.0-beta.4"
   },
@@ -78,7 +78,7 @@
       "optional": true
     }
   },
-  "packageManager": "pnpm@8.8.0+sha256.d713a5750e41c3660d1e090608c7f607ad00d1dd5ba9b6552b5f390bf37924e9",
+  "packageManager": "pnpm@8.10.2+sha256.487609e857f1c11780cc98dd0bfe4c8a8b11c7f23bc3a4493ac7d263d6fb6c8c",
   "publishConfig": {
     "access": "public",
     "provenance": true

@@ -38,7 +38,7 @@
     "build-and-check": "concurrently -g pnpm:build pnpm:check:*",
     "check:format": "pnpm run _prettier --check",
     "check:lint": "pnpm run _eslint",
-    "check:types": "vitest typecheck --run",
+    "check:types": "vitest --typecheck.only --run",
     "coverage": "vitest run --coverage",
     "format": "pnpm run _prettier --write && pnpm run _eslint --fix",
     "test": "vitest"
@@ -56,8 +56,8 @@
     "@mcous/typescript-config": "0.2.1",
     "@typescript-eslint/eslint-plugin": "6.7.4",
     "@typescript-eslint/parser": "6.7.4",
-    "@vitest/coverage-istanbul": "^0.31.0",
-    "@vitest/expect": "^0.31.0",
+    "@vitest/coverage-istanbul": "^1.0.0-beta.4",
+    "@vitest/expect": "^1.0.0-beta.4",
     "concurrently": "^8.0.1",
     "eslint": "8.51.0",
     "eslint-config-prettier": "9.0.0",
@@ -67,11 +67,11 @@
     "prettier": "3.0.3",
     "tsup": "^6.7.0",
     "typescript": "5.2.2",
-    "vitest": "^0.31.0"
+    "vitest": "^1.0.0-beta.4"
   },
   "peerDependencies": {
-    "@vitest/expect": ">=0.31.0 <1.0.0",
-    "vitest": ">=0.31.0 <1.0.0"
+    "@vitest/expect": ">=0.31.0 <2.0.0",
+    "vitest": ">=0.31.0 <2.0.0"
   },
   "peerDependenciesMeta": {
     "@vitest/expect": {

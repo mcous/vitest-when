@@ -16,7 +16,7 @@
     "url": "https://github.com/mcous/vitest-when.git"
   },
   "license": "MIT",
-  "author": "Michael Cousins <michael@cousins.io> (https://mike.cousins.io)",
+  "author": "Michael Cousins <michael@cousins.io> (https://michael.cousins.io)",
   "type": "module",
   "exports": {
     ".": {

@@ -1,5 +1,7 @@
 # vitest-when
 
+> [Better mocking in Vitest][introducing vitest-when]
+
 [![npm badge][]][npm]
 [![ci badge][]][ci]
 [![coverage badge][]][coverage]
@@ -10,6 +12,7 @@ Stub behaviors of [Vitest][] mock functions with a small, readable API. Inspired
 npm install --save-dev vitest-when
 ```
 
+[introducing vitest-when]: https://michael.cousins.io/articles/2023-06-30-better-stubs/
 [vitest]: https://vitest.dev/
 [testdouble.js]: https://github.com/testdouble/testdouble.js/
 [jest-when]: https://github.com/timkindberg/jest-when

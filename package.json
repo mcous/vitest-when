@@ -21,8 +21,7 @@
   "exports": {
     ".": {
       "types": "./dist/vitest-when.d.ts",
-      "import": "./dist/vitest-when.js",
-      "require": "./dist/vitest-when.cjs"
+      "import": "./dist/vitest-when.js"
     }
   },
   "types": "./dist/vitest-when.d.ts",

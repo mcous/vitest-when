@@ -4,12 +4,15 @@
 [![ci badge][]][ci]
 [![coverage badge][]][coverage]
 
+Read the introductory post: [Better mocks in Vitest][better-mocks]
+
 Stub behaviors of [Vitest][] mock functions with a small, readable API. Inspired by [testdouble.js][] and [jest-when][].
 
 ```shell
 npm install --save-dev vitest-when
 ```
 
+[better-mocks]: https://michael.cousins.io/articles/2023-06-30-better-stubs/
 [vitest]: https://vitest.dev/
 [testdouble.js]: https://github.com/testdouble/testdouble.js/
 [jest-when]: https://github.com/timkindberg/jest-when

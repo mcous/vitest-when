@@ -16,13 +16,12 @@
     "url": "https://github.com/mcous/vitest-when.git"
   },
   "license": "MIT",
-  "author": "Michael Cousins <michael@cousins.io> (https://mike.cousins.io)",
+  "author": "Michael Cousins <michael@cousins.io> (https://michael.cousins.io)",
   "type": "module",
   "exports": {
     ".": {
       "types": "./dist/vitest-when.d.ts",
-      "import": "./dist/vitest-when.js",
-      "require": "./dist/vitest-when.cjs"
+      "import": "./dist/vitest-when.js"
     }
   },
   "types": "./dist/vitest-when.d.ts",
@@ -34,11 +33,11 @@
     "_eslint": "eslint --ignore-path .lintignore \"**/*.ts\"",
     "_prettier": "prettier --ignore-path .lintignore \"**/*.@(ts|json|yaml|md)\"",
     "all": "concurrently -g pnpm:coverage pnpm:build pnpm:check:*",
-    "build": "tsup --clean --sourcemap --dts --format esm,cjs --target node14 src/vitest-when.ts",
+    "build": "tsup --clean --sourcemap --dts --format esm --target node14 src/vitest-when.ts",
     "build-and-check": "concurrently -g pnpm:build pnpm:check:*",
     "check:format": "pnpm run _prettier --check",
     "check:lint": "pnpm run _eslint",
-    "check:types": "vitest typecheck --run",
+    "check:types": "vitest --typecheck.only --run",
     "coverage": "vitest run --coverage",
     "format": "pnpm run _prettier --write && pnpm run _eslint --fix",
     "test": "vitest"
@@ -51,34 +50,34 @@
     "extends": "@mcous/eslint-config"
   },
   "devDependencies": {
-    "@mcous/eslint-config": "0.3.3",
+    "@mcous/eslint-config": "0.4.2",
     "@mcous/prettier-config": "0.3.0",
     "@mcous/typescript-config": "0.2.1",
-    "@typescript-eslint/eslint-plugin": "6.7.4",
-    "@typescript-eslint/parser": "6.7.4",
-    "@vitest/coverage-istanbul": "^0.31.0",
-    "@vitest/expect": "^0.31.0",
-    "concurrently": "^8.0.1",
-    "eslint": "8.51.0",
+    "@typescript-eslint/eslint-plugin": "6.13.1",
+    "@typescript-eslint/parser": "6.13.1",
+    "@vitest/coverage-istanbul": "^1.0.0-beta.6",
+    "@vitest/expect": "^1.0.0-beta.6",
+    "concurrently": "^8.2.2",
+    "eslint": "8.54.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-promise": "6.1.1",
-    "eslint-plugin-sonarjs": "0.21.0",
-    "eslint-plugin-unicorn": "48.0.1",
-    "prettier": "3.0.3",
-    "tsup": "^6.7.0",
-    "typescript": "5.2.2",
-    "vitest": "^0.31.0"
+    "eslint-plugin-sonarjs": "0.23.0",
+    "eslint-plugin-unicorn": "49.0.0",
+    "prettier": "3.1.0",
+    "tsup": "^8.0.1",
+    "typescript": "5.3.2",
+    "vitest": "^1.0.0-beta.6"
   },
   "peerDependencies": {
-    "@vitest/expect": ">=0.31.0 <1.0.0",
-    "vitest": ">=0.31.0 <1.0.0"
+    "@vitest/expect": ">=0.31.0 <2.0.0",
+    "vitest": ">=0.31.0 <2.0.0"
   },
   "peerDependenciesMeta": {
     "@vitest/expect": {
       "optional": true
     }
   },
-  "packageManager": "pnpm@8.8.0+sha256.d713a5750e41c3660d1e090608c7f607ad00d1dd5ba9b6552b5f390bf37924e9",
+  "packageManager": "pnpm@8.11.0+sha256.5858806c3b292cbec89b5533662168a957358e2bbd86431516d441dc1aface89",
   "publishConfig": {
     "access": "public",
     "provenance": true

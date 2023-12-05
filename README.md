@@ -184,7 +184,7 @@ export const calculateQuestion = async (answer: number): Promise<string> => {
 
 ## API
 
-### `when(spy: TFunc): StubWrapper<TFunc>`
+### `when(spy: TFunc, options?: WhenOptions): StubWrapper<TFunc>`
 
 Configures a `vi.fn()` mock function to act as a vitest-when stub. Adds an implementation to the function that initially no-ops, and returns an API to configure behaviors for given arguments using [`.calledWith(...)`][called-with]
 
@@ -198,6 +198,16 @@ when(spy)
 
 expect(spy()).toBe(undefined)
 ```
+
+#### Options
+
+```ts
+import type { WhenOptions } from 'vitest-when'
+```
+
+| option  | required | type    | description                                        |
+| ------- | -------- | ------- | -------------------------------------------------- |
+| `times` | no       | integer | Only trigger configured behavior a number of times |
 
 ### `.calledWith(...args: TArgs): Stub<TArgs, TReturn>`
 
@@ -266,20 +276,20 @@ when(spy).calledWith('hello').thenReturn('world')
 expect(spy('hello')).toEqual('world')
 ```
 
-To only return a value once, use the `ONCE` option.
+To only return a value once, use the `times` option.
 
 ```ts
-import { ONCE, when } from 'vitest-when'
+import { when } from 'vitest-when'
 
 const spy = vi.fn()
 
-when(spy).calledWith('hello').thenReturn('world', ONCE)
+when(spy, { times: 1 }).calledWith('hello').thenReturn('world')
 
 expect(spy('hello')).toEqual('world')
 expect(spy('hello')).toEqual(undefined)
 ```
 
-You may pass several values to `thenReturn` to return different values in succession. The last value will be latched, unless you pass the `ONCE` option.
+You may pass several values to `thenReturn` to return different values in succession. If you do not specify `times`, the last value will be latched. Otherwise, each value will be returned the specified number of times.
 
 ```ts
 const spy = vi.fn()
@@ -303,20 +313,20 @@ when(spy).calledWith('hello').thenResolve('world')
 expect(await spy('hello')).toEqual('world')
 ```
 
-To only resolve a value once, use the `ONCE` option.
+To only resolve a value once, use the `times` option.
 
 ```ts
-import { ONCE, when } from 'vitest-when'
+import { when } from 'vitest-when'
 
 const spy = vi.fn()
 
-when(spy).calledWith('hello').thenResolve('world', ONCE)
+when(spy, { times: 1 }).calledWith('hello').thenResolve('world')
 
 expect(await spy('hello')).toEqual('world')
 expect(spy('hello')).toEqual(undefined)
 ```
 
-You may pass several values to `thenResolve` to resolve different values in succession. The last value will be latched, unless you pass the `ONCE` option.
+You may pass several values to `thenResolve` to resolve different values in succession. If you do not specify `times`, the last value will be latched. Otherwise, each value will be resolved the specified number of times.
 
 ```ts
 const spy = vi.fn()
@@ -340,20 +350,20 @@ when(spy).calledWith('hello').thenThrow(new Error('oh no'))
 expect(() => spy('hello')).toThrow('oh no')
 ```
 
-To only throw an error only once, use the `ONCE` option.
+To only throw an error only once, use the `times` option.
 
 ```ts
-import { ONCE, when } from 'vitest-when'
+import { when } from 'vitest-when'
 
 const spy = vi.fn()
 
-when(spy).calledWith('hello').thenThrow(new Error('oh no'), ONCE)
+when(spy, { times: 1 }).calledWith('hello').thenThrow(new Error('oh no'))
 
 expect(() => spy('hello')).toThrow('oh no')
 expect(spy('hello')).toEqual(undefined)
 ```
 
-You may pass several values to `thenThrow` to throw different errors in succession. The last value will be latched, unless you pass the `ONCE` option.
+You may pass several values to `thenThrow` to throw different errors in succession. If you do not specify `times`, the last value will be latched. Otherwise, each error will be thrown the specified number of times.
 
 ```ts
 const spy = vi.fn()
@@ -379,20 +389,20 @@ when(spy).calledWith('hello').thenReject(new Error('oh no'))
 await expect(spy('hello')).rejects.toThrow('oh no')
 ```
 
-To only throw an error only once, use the `ONCE` option.
+To only throw an error only once, use the `times` option.
 
 ```ts
-import { ONCE, when } from 'vitest-when'
+import { times, when } from 'vitest-when'
 
 const spy = vi.fn()
 
-when(spy).calledWith('hello').thenReject(new Error('oh no'), ONCE)
+when(spy, { times: 1 }).calledWith('hello').thenReject(new Error('oh no'))
 
 await expect(spy('hello')).rejects.toThrow('oh no')
 expect(spy('hello')).toEqual(undefined)
 ```
 
-You may pass several values to `thenReject` to throw different errors in succession. The last value will be latched, unless you pass the `ONCE` option.
+You may pass several values to `thenReject` to throw different errors in succession. If you do not specify `times`, the last value will be latched. Otherwise, each rejection will be triggered the specified number of times.
 
 ```ts
 const spy = vi.fn()
@@ -425,22 +435,22 @@ expect(spy('hello')).toEqual('world')
 expect(called).toEqual(true)
 ```
 
-To only run the callback once, use the `ONCE` option.
+To only run the callback once, use the `times` option.
 
 ```ts
-import { ONCE, when } from 'vitest-when'
+import { times, when } from 'vitest-when'
 
 const spy = vi.fn()
 
-when(spy)
+when(spy, { times: 1 })
   .calledWith('hello')
-  .thenDo(() => 'world', ONCE)
+  .thenDo(() => 'world')
 
 expect(spy('hello')).toEqual('world')
 expect(spy('hello')).toEqual(undefined)
 ```
 
-You may pass several callbacks to `thenDo` to trigger different side-effects in succession. The last callback will be latched, unless you pass the `ONCE` option.
+You may pass several callbacks to `thenDo` to trigger different side-effects in succession. If you do not specify `times`, the last callback will be latched. Otherwise, each callback will be triggered the specified number of times.
 
 ```ts
 const spy = vi.fn()

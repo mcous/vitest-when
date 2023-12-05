@@ -55,11 +55,12 @@ describe('vitest-when', () => {
     expect(spy(1, 2, 3)).toEqual(undefined)
   })
 
-  it('should return a value once', () => {
+  it('should return a number of times', () => {
     const spy = vi.fn()
 
-    subject.when(spy).calledWith(1, 2, 3).thenReturn(4, subject.ONCE)
+    subject.when(spy, { times: 2 }).calledWith(1, 2, 3).thenReturn(4)
 
+    expect(spy(1, 2, 3)).toEqual(4)
     expect(spy(1, 2, 3)).toEqual(4)
     expect(spy(1, 2, 3)).toEqual(undefined)
   })
@@ -154,14 +155,15 @@ describe('vitest-when', () => {
     await expect(spy(1, 2, 3)).rejects.toThrow('6')
   })
 
-  it('should reject once', async () => {
+  it('should reject a number of times', async () => {
     const spy = vi.fn()
 
     subject
-      .when(spy)
+      .when(spy, { times: 2 })
       .calledWith(1, 2, 3)
-      .thenReject(new Error('4'), subject.ONCE)
+      .thenReject(new Error('4'))
 
+    await expect(spy(1, 2, 3)).rejects.toThrow('4')
     await expect(spy(1, 2, 3)).rejects.toThrow('4')
     expect(spy(1, 2, 3)).toEqual(undefined)
   })

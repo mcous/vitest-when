@@ -1,24 +1,25 @@
 import { equals } from '@vitest/expect'
 import type { AnyFunction } from './types.ts'
 
-export const ONCE = Symbol('ONCE')
-
-export type StubValue<TValue> = TValue | typeof ONCE
+export interface WhenOptions {
+  times?: number
+}
 
 export interface BehaviorStack<TFunc extends AnyFunction> {
   use: (args: Parameters<TFunc>) => BehaviorEntry<Parameters<TFunc>> | undefined
 
   bindArgs: <TArgs extends Parameters<TFunc>>(
     args: TArgs,
+    options: WhenOptions,
   ) => BoundBehaviorStack<ReturnType<TFunc>>
 }
 
 export interface BoundBehaviorStack<TReturn> {
-  addReturn: (values: StubValue<TReturn>[]) => void
-  addResolve: (values: StubValue<Awaited<TReturn>>[]) => void
-  addThrow: (values: StubValue<unknown>[]) => void
-  addReject: (values: StubValue<unknown>[]) => void
-  addDo: (values: StubValue<AnyFunction>[]) => void
+  addReturn: (values: TReturn[]) => void
+  addResolve: (values: Awaited<TReturn>[]) => void
+  addThrow: (values: unknown[]) => void
+  addReject: (values: unknown[]) => void
+  addDo: (values: AnyFunction[]) => void
 }
 
 export interface BehaviorEntry<TArgs extends unknown[]> {
@@ -52,10 +53,10 @@ export const createBehaviorStack = <
       return behavior
     },
 
-    bindArgs: (args) => ({
+    bindArgs: (args, options) => ({
       addReturn: (values) => {
         behaviors.unshift(
-          ...getBehaviorOptions(values).map(({ value, times }) => ({
+          ...getBehaviorOptions(values, options).map(({ value, times }) => ({
             args,
             times,
             returnValue: value,
@@ -64,7 +65,7 @@ export const createBehaviorStack = <
       },
       addResolve: (values) => {
         behaviors.unshift(
-          ...getBehaviorOptions(values).map(({ value, times }) => ({
+          ...getBehaviorOptions(values, options).map(({ value, times }) => ({
             args,
             times,
             returnValue: Promise.resolve(value),
@@ -73,7 +74,7 @@ export const createBehaviorStack = <
       },
       addThrow: (values) => {
         behaviors.unshift(
-          ...getBehaviorOptions(values).map(({ value, times }) => ({
+          ...getBehaviorOptions(values, options).map(({ value, times }) => ({
             args,
             times,
             throwError: value,
@@ -82,7 +83,7 @@ export const createBehaviorStack = <
       },
       addReject: (values) => {
         behaviors.unshift(
-          ...getBehaviorOptions(values).map(({ value, times }) => ({
+          ...getBehaviorOptions(values, options).map(({ value, times }) => ({
             args,
             times,
             returnValue: Promise.reject(value),
@@ -91,7 +92,7 @@ export const createBehaviorStack = <
       },
       addDo: (values) => {
         behaviors.unshift(
-          ...getBehaviorOptions(values).map(({ value, times }) => ({
+          ...getBehaviorOptions(values, options).map(({ value, times }) => ({
             args,
             times,
             doCallback: value,
@@ -103,18 +104,16 @@ export const createBehaviorStack = <
 }
 
 const getBehaviorOptions = <TValue>(
-  valuesAndOptions: StubValue<TValue>[],
+  values: TValue[],
+  { times }: WhenOptions,
 ): BehaviorOptions<TValue>[] => {
-  const once = valuesAndOptions.includes(ONCE)
-  let values = valuesAndOptions.filter((value) => value !== ONCE) as TValue[]
-
   if (values.length === 0) {
     values = [undefined as TValue]
   }
 
   return values.map((value, index) => ({
     value,
-    times: once || index < values.length - 1 ? 1 : undefined,
+    times: times ?? (index < values.length - 1 ? 1 : undefined),
   }))
 }
 

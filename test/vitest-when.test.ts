@@ -256,4 +256,12 @@ describe('vitest-when', () => {
 
     expect(spy({ foo: { bar: { baz: 0 } } })).toEqual(100)
   })
+
+  it('should not trigger unhandled rejection warnings when rejection unused', () => {
+    const spy = vi.fn()
+    const error = new Error('uh uhh')
+    subject.when(spy).calledWith('/api/foo').thenReject(error)
+    // intentionally do not call the spy
+    expect(true).toBe(true)
+  })
 })

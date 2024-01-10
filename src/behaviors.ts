@@ -25,6 +25,7 @@ export interface BoundBehaviorStack<TReturn> {
 export interface BehaviorEntry<TArgs extends unknown[]> {
   args: TArgs
   returnValue?: unknown
+  rejectError?: unknown
   throwError?: unknown
   doCallback?: AnyFunction | undefined
   times?: number | undefined
@@ -86,7 +87,7 @@ export const createBehaviorStack = <
           ...getBehaviorOptions(values, options).map(({ value, times }) => ({
             args,
             times,
-            returnValue: Promise.reject(value),
+            rejectError: value,
           })),
         )
       },

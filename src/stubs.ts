@@ -32,6 +32,10 @@ export const configureStub = <TFunc extends AnyFunction>(
       throw behavior.throwError as Error
     }
 
+    if (behavior?.rejectError) {
+      return Promise.reject(behavior.rejectError)
+    }
+
     if (behavior?.doCallback) {
       return behavior.doCallback(...args)
     }

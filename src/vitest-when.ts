@@ -1,9 +1,12 @@
+import { assert } from 'vitest'
 import { configureStub } from './stubs.ts'
-import type { WhenOptions } from './behaviors.ts'
+import type { BehaviorStack, WhenOptions } from './behaviors.ts'
 import type { AnyFunction } from './types.ts'
 
 export type { WhenOptions } from './behaviors.ts'
 export * from './errors.ts'
+
+export const behaviorStackRegistry = new Set<BehaviorStack<AnyFunction>>()
 
 export interface StubWrapper<TFunc extends AnyFunction> {
   calledWith<TArgs extends Parameters<TFunc>>(
@@ -25,6 +28,8 @@ export const when = <TFunc extends AnyFunction>(
 ): StubWrapper<TFunc> => {
   const behaviorStack = configureStub(spy)
 
+  behaviorStackRegistry.add(behaviorStack)
+
   return {
     calledWith: (...args) => {
       const behaviors = behaviorStack.bindArgs(args, options)
@@ -38,4 +43,11 @@ export const when = <TFunc extends AnyFunction>(
       }
     },
   }
+}
+
+export const verifyAllWhenMocksCalled = () => {
+  const uncalledMocks = [...behaviorStackRegistry].flatMap((behaviorStack) => {
+    return behaviorStack.get().filter(behavior => behavior.times && behavior.times > 0)
+  })
+  assert.equal(uncalledMocks.length,0, `Failed verifyAllWhenMocksCalled: ${uncalledMocks.length} mock(s) not called:`)
 }

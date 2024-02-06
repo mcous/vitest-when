@@ -8,6 +8,8 @@ export interface WhenOptions {
 export interface BehaviorStack<TFunc extends AnyFunction> {
   use: (args: Parameters<TFunc>) => BehaviorEntry<Parameters<TFunc>> | undefined
 
+  get: () => BehaviorEntry<Parameters<TFunc>>[]
+
   bindArgs: <TArgs extends Parameters<TFunc>>(
     args: TArgs,
     options: WhenOptions,
@@ -53,6 +55,8 @@ export const createBehaviorStack = <
 
       return behavior
     },
+
+    get: () => behaviors,
 
     bindArgs: (args, options) => ({
       addReturn: (values) => {

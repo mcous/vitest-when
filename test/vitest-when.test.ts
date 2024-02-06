@@ -1,6 +1,7 @@
-import { vi, describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import * as subject from '../src/vitest-when.ts'
+import AssertionError = Chai.AssertionError
 
 declare module 'vitest' {
   interface AsymmetricMatchersContaining {
@@ -263,5 +264,23 @@ describe('vitest-when', () => {
     subject.when(spy).calledWith('/api/foo').thenReject(error)
     // intentionally do not call the spy
     expect(true).toBe(true)
+  })
+
+  it('should fail if there are uncalled mocks and verify function is called', () => {
+    const spy = vi.fn()
+    subject.when(spy, { times: 2 }).calledWith(1, 2, 3).thenReturn(4)
+    spy(1, 2, 3)
+
+    let error: AssertionError | undefined = undefined
+    try {
+      subject.verifyAllWhenMocksCalled()
+    } catch (assertionError) {
+      error = assertionError as AssertionError
+      expect(error).toEqual(expect.objectContaining({ expected: 0, actual: 1 }))
+      expect(error.message).toContain(
+        'Failed verifyAllWhenMocksCalled: 1 mock(s) not called',
+      )
+    }
+    expect(error).toBeDefined()
   })
 })

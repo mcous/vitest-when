@@ -67,6 +67,25 @@ test('stubbing with vitest-when', () => {
 
 You should call `vi.resetAllMocks()` in your suite's `afterEach` hook to remove the implementation added by `when`. You can also set Vitest's [`mockReset`](https://vitest.dev/config/#mockreset) config to `true` instead of using `afterEach`.
 
+#### Supports verifying that all mocked functions were called
+
+Call `verifyAllWhenMocksCalled` after your test to assert that all mocks using `{ times: x }` were used.
+
+```javascript
+import { verifyAllWhenMocksCalled, when } from 'vitest-when'
+
+afterEach(() => {
+    verifyAllWhenMocksCalled() // fails because spy is only called once
+})
+
+it('should call spy two times', () => {
+    const spy = vi.fn()
+    when(spy, {times: 2}).calledWith(1, 2, 3).thenReturn(4)
+    spy(1, 2, 3)
+})
+```
+
+
 [vitest's mock functions]: https://vitest.dev/api/mock.html
 [stubs]: https://en.wikipedia.org/wiki/Test_stub
 [when]: #whenspy-tfunc-stubwrappertfunc

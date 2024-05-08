@@ -81,5 +81,8 @@
   "publishConfig": {
     "access": "public",
     "provenance": true
+  },
+  "dependencies": {
+    "pretty-format": "^29.7.0"
   }
 }

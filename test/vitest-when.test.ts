@@ -349,4 +349,15 @@ describe('vitest-when', () => {
       unmatchedCalls: [],
     })
   })
+
+  it('logs debug description', () => {
+    const coolFunction = vi.fn().mockName('coolFunc')
+
+    subject.when(coolFunction).calledWith(1, 2, 3).thenReturn(123)
+    subject.when(coolFunction).calledWith(4, 5, 6).thenThrow(new Error('oh no'))
+
+    coolFunction(1, 2, 4)
+
+    subject.debug(coolFunction)
+  })
 })

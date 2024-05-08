@@ -466,7 +466,7 @@ expect(spy('hello')).toEqual('world')
 expect(spy('hello')).toEqual('solar system')
 ```
 
-### `debug(spy: TFunc, options?: DebugsOptions): DebugInfo`
+### `debug(spy: TFunc, options?: DebugOptions): DebugInfo`
 
 Logs and returns information about a mock's stubbing and usage. Useful if a test with mocks is failing and you can't figure out why.
 
@@ -481,13 +481,13 @@ when(coolFunc).calledWith(4, 5, 6).thenThrow(new Error('oh no'))
 const result = coolFunc(1, 2, 4)
 
 debug(coolFunc)
-// `coolFunc` has:
+// `coolFunc()` has:
 //
-// 2 stubbings with 0 calls:
-// - `coolFunc(1, 2, 4)` -> `return 123`, called 0 times.
-// - `coolFunc(4, 5, 6)` -> `throw Error('oh no)`, called 0 times.
+// 2 stubbings with 0 calls
+// - 0 calls: `coolFunc(4, 5, 6) => { throw [Error: oh no] }`
+// - 0 calls: `coolFunc(1, 2, 3) => 123`
 //
-// 1 unmatched call:
+// 1 unmatched call
 // - `coolFunc(1, 2, 4)`
 ```
 

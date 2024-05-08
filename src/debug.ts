@@ -46,7 +46,7 @@ export const formatDebug = (debug: DebugResult): string => {
   const unmatchedCallsCount = unmatchedCalls.length
 
   return [
-    `\`${name}\` has:`,
+    `\`${name}()\` has:`,
     '',
     `${stubbingCount} ${plural(
       'stubbing',
@@ -63,9 +63,9 @@ const formatStubbing = (
   name: string,
   { args, behavior, calls }: Stubbing,
 ): string => {
-  return `\`${formatCall(name, args)} ${formatBehavior(behavior)}\`, called ${
-    calls.length
-  } times`
+  return `${calls.length} calls: \`${formatCall(name, args)} ${formatBehavior(
+    behavior,
+  )}\``
 }
 
 const formatCall = (name: string, args: readonly unknown[]): string => {

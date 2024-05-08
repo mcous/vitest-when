@@ -484,8 +484,8 @@ debug(coolFunc)
 // `coolFunc()` has:
 //
 // 2 stubbings with 0 calls
-// - 0 calls: `coolFunc(4, 5, 6) => { throw [Error: oh no] }`
 // - 0 calls: `coolFunc(1, 2, 3) => 123`
+// - 0 calls: `coolFunc(4, 5, 6) => { throw [Error: oh no] }`
 //
 // 1 unmatched call
 // - `coolFunc(1, 2, 4)`

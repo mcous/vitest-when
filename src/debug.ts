@@ -52,7 +52,9 @@ export const formatDebug = (debug: DebugResult): string => {
       'stubbing',
       stubbingCount,
     )} with ${callCount} calls`,
-    ...stubbings.map((stubbing) => `- ${formatStubbing(name, stubbing)}`),
+    ...stubbings
+      .map((stubbing) => `- ${formatStubbing(name, stubbing)}`)
+      .reverse(),
     '',
     `${unmatchedCallsCount} unmatched ${plural('call', unmatchedCallsCount)}`,
     ...unmatchedCalls.map((args) => `- \`${formatCall(name, args)}\``),

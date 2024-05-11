@@ -9,6 +9,7 @@ import type { Behavior } from './behaviors'
 
 export interface DebugResult {
   name: string
+  description: string
   stubbings: readonly Stubbing[]
   unmatchedCalls: readonly unknown[][]
 }
@@ -33,10 +34,13 @@ export const getDebug = <TFunc extends AnyFunction>(
       calls: entry.calls,
     })) ?? []
 
-  return { name, stubbings, unmatchedCalls }
+  const result = { name, stubbings, unmatchedCalls }
+  const description = formatDebug(result)
+
+  return { ...result, description }
 }
 
-export const formatDebug = (debug: DebugResult): string => {
+const formatDebug = (debug: Omit<DebugResult, 'description'>): string => {
   const { name, stubbings, unmatchedCalls } = debug
   const callCount = stubbings.reduce(
     (result, { calls }) => result + calls.length,
@@ -47,31 +51,22 @@ export const formatDebug = (debug: DebugResult): string => {
 
   return [
     `\`${name}()\` has:`,
+    `* ${count(stubbingCount, 'stubbing')} with ${count(callCount, 'call')}`,
+    ...stubbings.map((stubbing) => `  * ${formatStubbing(stubbing)}`).reverse(),
+    `* ${count(unmatchedCallsCount, 'unmatched call')}`,
+    ...unmatchedCalls.map((args) => `  * \`${formatCall(args)}\``),
     '',
-    `${stubbingCount} ${plural(
-      'stubbing',
-      stubbingCount,
-    )} with ${callCount} calls`,
-    ...stubbings
-      .map((stubbing) => `- ${formatStubbing(name, stubbing)}`)
-      .reverse(),
-    '',
-    `${unmatchedCallsCount} unmatched ${plural('call', unmatchedCallsCount)}`,
-    ...unmatchedCalls.map((args) => `- \`${formatCall(name, args)}\``),
   ].join('\n')
 }
 
-const formatStubbing = (
-  name: string,
-  { args, behavior, calls }: Stubbing,
-): string => {
-  return `${calls.length} calls: \`${formatCall(name, args)} ${formatBehavior(
-    behavior,
-  )}\``
+const formatStubbing = ({ args, behavior, calls }: Stubbing): string => {
+  return `Called ${count(calls.length, 'time')}: \`${formatCall(
+    args,
+  )} ${formatBehavior(behavior)}\``
 }
 
-const formatCall = (name: string, args: readonly unknown[]): string => {
-  return `${name}(${args.map((a) => stringify(a)).join(', ')})`
+const formatCall = (args: readonly unknown[]): string => {
+  return `(${args.map((a) => stringify(a)).join(', ')})`
 }
 
 const formatBehavior = (behavior: Behavior): string => {
@@ -98,8 +93,8 @@ const formatBehavior = (behavior: Behavior): string => {
   }
 }
 
-const plural = (thing: string, count: number) =>
-  `${thing}${count === 1 ? '' : 's'}`
+const count = (amount: number, thing: string) =>
+  `${amount} ${thing}${amount === 1 ? '' : 's'}`
 
 const {
   AsymmetricMatcher,

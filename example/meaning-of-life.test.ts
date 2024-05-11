@@ -1,5 +1,5 @@
 import { vi, describe, afterEach, it, expect } from 'vitest'
-import { when } from 'vitest-when'
+import { when, debug } from 'vitest-when'
 
 import * as deepThought from './deep-thought.ts'
 import * as earth from './earth.ts'
@@ -18,6 +18,9 @@ describe('get the meaning of life', () => {
     when(earth.calculateQuestion).calledWith(42).thenResolve("What's 6 by 9?")
 
     const result = await subject.createMeaning()
+
+    debug(deepThought.calculateAnswer)
+    debug(earth.calculateQuestion)
 
     expect(result).toEqual({ question: "What's 6 by 9?", answer: 42 })
   })

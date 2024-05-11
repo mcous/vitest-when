@@ -491,7 +491,7 @@ debug(coolFunc)
 // - `coolFunc(1, 2, 4)`
 ```
 
-#### Options
+#### `DebugOptions`
 
 ```ts
 import type { DebugOptions } from 'vitest-when'
@@ -501,22 +501,23 @@ import type { DebugOptions } from 'vitest-when'
 | ------ | ------- | ------- | -------------------------------------- |
 | `log`  | `true`  | boolean | Whether the call to `debug` should log |
 
-#### Result
+#### `DebugResult`
 
 ```ts
 import type { DebugResult, DebugStubbing, DebugBehavior } from 'vitest-when'
 ```
 
-| fields                       | type                                         | description                                                |
-| ---------------------------- | -------------------------------------------- | ---------------------------------------------------------- |
-| `name`                       | `string`                                     | The name of the mock, if set by [`mockName`][mockName]     |
-| `stubbings`                  | `DebugStubbing[]`                            | The list of configured stub behaviors                      |
-| `stubbings[].args`           | `unknown[]`                                  | The stubbing's arguments to match                          |
-| `stubbings[].behavior`       | `DebugBehavior`                              | The configured behavior of the stubbing                    |
-| `stubbings[].behavior.type`  | `return`, `throw`, `resolve`, `reject`, `do` | Result type of the stubbing                                |
-| `stubbings[].behavior.value` | `unknown`                                    | Value for the behahior, if `type` is `return` or `resolve` |
-| `stubbings[].behavior.error` | `unknown`                                    | Error for the behavior, it `type` is `throw` or `reject`   |
-| `stubbings[].matchedCalls`   | `unknown[][]`                                | Actual calls that matched the stubbing, if any             |
-| `unmatchedCalls`             | `unknown[][]`                                | Actual calls that did not match a stubbing                 |
+| fields                       | type                                         | description                                                 |
+| ---------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
+| `description`                | `string`                                     | A human-readable description of the stub, logged by default |
+| `name`                       | `string`                                     | The name of the mock, if set by [`mockName`][mockName]      |
+| `stubbings`                  | `DebugStubbing[]`                            | The list of configured stub behaviors                       |
+| `stubbings[].args`           | `unknown[]`                                  | The stubbing's arguments to match                           |
+| `stubbings[].behavior`       | `DebugBehavior`                              | The configured behavior of the stubbing                     |
+| `stubbings[].behavior.type`  | `return`, `throw`, `resolve`, `reject`, `do` | Result type of the stubbing                                 |
+| `stubbings[].behavior.value` | `unknown`                                    | Value for the behavior, if `type` is `return` or `resolve`  |
+| `stubbings[].behavior.error` | `unknown`                                    | Error for the behavior, it `type` is `throw` or `reject`    |
+| `stubbings[].matchedCalls`   | `unknown[][]`                                | Actual calls that matched the stubbing, if any              |
+| `unmatchedCalls`             | `unknown[][]`                                | Actual calls that did not match a stubbing                  |
 
 [mockName]: https://vitest.dev/api/mock.html#mockname

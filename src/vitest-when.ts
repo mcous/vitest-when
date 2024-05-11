@@ -1,7 +1,7 @@
 import { configureStub } from './stubs.ts'
 import type { WhenOptions } from './behaviors.ts'
 import type { AnyFunction } from './types.ts'
-import { getDebug, formatDebug, type DebugResult } from './debug.ts'
+import { getDebug, type DebugResult } from './debug.ts'
 
 export type { WhenOptions } from './behaviors.ts'
 export * from './errors.ts'
@@ -52,8 +52,7 @@ export const debug = <TFunc extends AnyFunction>(
   const result = getDebug(spy)
 
   if (options.log !== false) {
-    const description = formatDebug(result)
-    console.debug(description)
+    console.debug(result.description)
   }
 
   return result

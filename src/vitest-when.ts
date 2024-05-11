@@ -1,8 +1,10 @@
 import { configureStub } from './stubs.ts'
 import type { WhenOptions } from './behaviors.ts'
 import type { AnyFunction } from './types.ts'
+import { getDebug, type DebugResult } from './debug.ts'
 
-export type { WhenOptions } from './behaviors.ts'
+export { type WhenOptions, type Behavior, BehaviorType } from './behaviors.ts'
+export type { DebugResult, Stubbing } from './debug.ts'
 export * from './errors.ts'
 
 export interface StubWrapper<TFunc extends AnyFunction> {
@@ -38,4 +40,22 @@ export const when = <TFunc extends AnyFunction>(
       }
     },
   }
+}
+
+export interface DebugOptions {
+  log?: boolean
+}
+
+export const debug = <TFunc extends AnyFunction>(
+  spy: TFunc,
+  options: DebugOptions = {},
+): DebugResult => {
+  const log = options.log ?? true
+  const result = getDebug(spy)
+
+  if (log) {
+    console.debug(result.description)
+  }
+
+  return result
 }

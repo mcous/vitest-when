@@ -205,9 +205,9 @@ expect(spy()).toBe(undefined)
 import type { WhenOptions } from 'vitest-when'
 ```
 
-| option  | required | type    | description                                        |
-| ------- | -------- | ------- | -------------------------------------------------- |
-| `times` | no       | integer | Only trigger configured behavior a number of times |
+| option  | default | type    | description                                        |
+| ------- | ------- | ------- | -------------------------------------------------- |
+| `times` | N/A     | integer | Only trigger configured behavior a number of times |
 
 ### `.calledWith(...args: TArgs): Stub<TArgs, TReturn>`
 
@@ -465,3 +465,57 @@ when(spy)
 expect(spy('hello')).toEqual('world')
 expect(spy('hello')).toEqual('solar system')
 ```
+
+### `debug(spy: TFunc, options?: DebugOptions): DebugInfo`
+
+Logs and returns information about a mock's stubbing and usage. Useful if a test with mocks is failing and you can't figure out why.
+
+```ts
+import { when, debug } from 'vitest-when'
+
+const coolFunc = vi.fn().mockName('coolFunc')
+
+when(coolFunc).calledWith(1, 2, 3).thenReturn(123)
+when(coolFunc).calledWith(4, 5, 6).thenThrow(new Error('oh no'))
+
+const result = coolFunc(1, 2, 4)
+
+debug(coolFunc)
+// `coolFunc()` has:
+// * 2 stubbings with 0 calls
+//   * Called 0 times: `(1, 2, 3) => 123`
+//   * Called 0 times: `(4, 5, 6) => { throw [Error: oh no] }`
+// * 1 unmatched call
+//   * `(1, 2, 4)`
+```
+
+#### `DebugOptions`
+
+```ts
+import type { DebugOptions } from 'vitest-when'
+```
+
+| option | default | type    | description                            |
+| ------ | ------- | ------- | -------------------------------------- |
+| `log`  | `true`  | boolean | Whether the call to `debug` should log |
+
+#### `DebugResult`
+
+```ts
+import type { DebugResult, Stubbing, Behavior } from 'vitest-when'
+```
+
+| fields                       | type                                         | description                                                 |
+| ---------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
+| `description`                | `string`                                     | A human-readable description of the stub, logged by default |
+| `name`                       | `string`                                     | The name of the mock, if set by [`mockName`][mockName]      |
+| `stubbings`                  | `Stubbing[]`                                 | The list of configured stub behaviors                       |
+| `stubbings[].args`           | `unknown[]`                                  | The stubbing's arguments to match                           |
+| `stubbings[].behavior`       | `Behavior`                                   | The configured behavior of the stubbing                     |
+| `stubbings[].behavior.type`  | `return`, `throw`, `resolve`, `reject`, `do` | Result type of the stubbing                                 |
+| `stubbings[].behavior.value` | `unknown`                                    | Value for the behavior, if `type` is `return` or `resolve`  |
+| `stubbings[].behavior.error` | `unknown`                                    | Error for the behavior, it `type` is `throw` or `reject`    |
+| `stubbings[].matchedCalls`   | `unknown[][]`                                | Actual calls that matched the stubbing, if any              |
+| `unmatchedCalls`             | `unknown[][]`                                | Actual calls that did not match a stubbing                  |
+
+[mockName]: https://vitest.dev/api/mock.html#mockname

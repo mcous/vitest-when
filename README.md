@@ -502,16 +502,16 @@ import type { DebugOptions } from 'vitest-when'
 #### `DebugResult`
 
 ```ts
-import type { DebugResult, DebugStubbing, DebugBehavior } from 'vitest-when'
+import type { DebugResult, Stubbing, Behavior } from 'vitest-when'
 ```
 
 | fields                       | type                                         | description                                                 |
 | ---------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
 | `description`                | `string`                                     | A human-readable description of the stub, logged by default |
 | `name`                       | `string`                                     | The name of the mock, if set by [`mockName`][mockName]      |
-| `stubbings`                  | `DebugStubbing[]`                            | The list of configured stub behaviors                       |
+| `stubbings`                  | `Stubbing[]`                                 | The list of configured stub behaviors                       |
 | `stubbings[].args`           | `unknown[]`                                  | The stubbing's arguments to match                           |
-| `stubbings[].behavior`       | `DebugBehavior`                              | The configured behavior of the stubbing                     |
+| `stubbings[].behavior`       | `Behavior`                                   | The configured behavior of the stubbing                     |
 | `stubbings[].behavior.type`  | `return`, `throw`, `resolve`, `reject`, `do` | Result type of the stubbing                                 |
 | `stubbings[].behavior.value` | `unknown`                                    | Value for the behavior, if `type` is `return` or `resolve`  |
 | `stubbings[].behavior.error` | `unknown`                                    | Error for the behavior, it `type` is `throw` or `reject`    |

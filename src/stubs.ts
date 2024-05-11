@@ -1,5 +1,9 @@
 import { type Mock as Spy } from 'vitest'
-import { createBehaviorStack, type BehaviorStack } from './behaviors.ts'
+import {
+  createBehaviorStack,
+  type BehaviorStack,
+  BehaviorType,
+} from './behaviors.ts'
 import { NotAMockFunctionError } from './errors.ts'
 import type { AnyFunction } from './types.ts'
 
@@ -24,28 +28,28 @@ export const configureStub = <TFunc extends AnyFunction>(
 
   const implementation = (...args: Parameters<TFunc>): unknown => {
     const behavior = behaviors.use(args)?.behavior ?? {
-      type: 'return',
+      type: BehaviorType.RETURN,
       value: undefined,
     }
 
     switch (behavior.type) {
-      case 'return': {
+      case BehaviorType.RETURN: {
         return behavior.value
       }
 
-      case 'resolve': {
+      case BehaviorType.RESOLVE: {
         return Promise.resolve(behavior.value)
       }
 
-      case 'throw': {
+      case BehaviorType.THROW: {
         throw behavior.error
       }
 
-      case 'reject': {
+      case BehaviorType.REJECT: {
         return Promise.reject(behavior.error)
       }
 
-      case 'do': {
+      case BehaviorType.DO: {
         return behavior.callback(...args)
       }
     }

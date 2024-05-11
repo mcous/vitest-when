@@ -5,7 +5,7 @@ import {
 
 import { validateSpy, getBehaviorStack } from './stubs'
 import type { AnyFunction } from './types'
-import type { Behavior } from './behaviors'
+import { type Behavior, BehaviorType } from './behaviors'
 
 export interface DebugResult {
   name: string
@@ -71,23 +71,23 @@ const formatCall = (args: readonly unknown[]): string => {
 
 const formatBehavior = (behavior: Behavior): string => {
   switch (behavior.type) {
-    case 'return': {
+    case BehaviorType.RETURN: {
       return `=> ${stringify(behavior.value)}`
     }
 
-    case 'resolve': {
+    case BehaviorType.RESOLVE: {
       return `=> Promise.resolve(${stringify(behavior.value)})`
     }
 
-    case 'throw': {
+    case BehaviorType.THROW: {
       return `=> { throw ${stringify(behavior.error)} }`
     }
 
-    case 'reject': {
+    case BehaviorType.REJECT: {
       return `=> Promise.reject(${stringify(behavior.error)})`
     }
 
-    case 'do': {
+    case BehaviorType.DO: {
       return `=> ${stringify(behavior.callback)}()`
     }
   }

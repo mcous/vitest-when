@@ -33,12 +33,20 @@ export interface BehaviorEntry<TArgs extends unknown[]> {
   maxCallCount?: number | undefined
 }
 
+export const BehaviorType = {
+  RETURN: 'return',
+  RESOLVE: 'resolve',
+  THROW: 'throw',
+  REJECT: 'reject',
+  DO: 'do',
+} as const
+
 export type Behavior =
-  | { type: 'return'; value: unknown }
-  | { type: 'resolve'; value: unknown }
-  | { type: 'throw'; error: unknown }
-  | { type: 'reject'; error: unknown }
-  | { type: 'do'; callback: AnyFunction }
+  | { type: typeof BehaviorType.RETURN; value: unknown }
+  | { type: typeof BehaviorType.RESOLVE; value: unknown }
+  | { type: typeof BehaviorType.THROW; error: unknown }
+  | { type: typeof BehaviorType.REJECT; error: unknown }
+  | { type: typeof BehaviorType.DO; callback: AnyFunction }
 
 export interface BehaviorOptions<TValue> {
   value: TValue
@@ -77,7 +85,7 @@ export const createBehaviorStack = <
             ({ value, maxCallCount }) => ({
               args,
               maxCallCount,
-              behavior: { type: 'return' as const, value },
+              behavior: { type: BehaviorType.RETURN, value },
               calls: [],
             }),
           ),
@@ -89,7 +97,7 @@ export const createBehaviorStack = <
             ({ value, maxCallCount }) => ({
               args,
               maxCallCount,
-              behavior: { type: 'resolve' as const, value },
+              behavior: { type: BehaviorType.RESOLVE, value },
               calls: [],
             }),
           ),
@@ -101,7 +109,7 @@ export const createBehaviorStack = <
             ({ value, maxCallCount }) => ({
               args,
               maxCallCount,
-              behavior: { type: 'throw' as const, error: value },
+              behavior: { type: BehaviorType.THROW, error: value },
               calls: [],
             }),
           ),
@@ -113,7 +121,7 @@ export const createBehaviorStack = <
             ({ value, maxCallCount }) => ({
               args,
               maxCallCount,
-              behavior: { type: 'reject' as const, error: value },
+              behavior: { type: BehaviorType.REJECT, error: value },
               calls: [],
             }),
           ),
@@ -125,7 +133,7 @@ export const createBehaviorStack = <
             ({ value, maxCallCount }) => ({
               args,
               maxCallCount,
-              behavior: { type: 'do' as const, callback: value },
+              behavior: { type: BehaviorType.DO, callback: value },
               calls: [],
             }),
           ),

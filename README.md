@@ -466,7 +466,7 @@ expect(spy('hello')).toEqual('world')
 expect(spy('hello')).toEqual('solar system')
 ```
 
-### `debug(spy: TFunc, options?: DebugOptions): DebugInfo`
+### `debug(spy: TFunc, options?: DebugOptions): DebugResult`
 
 Logs and returns information about a mock's stubbing and usage. Useful if a test with mocks is failing and you can't figure out why.
 

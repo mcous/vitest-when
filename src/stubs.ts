@@ -1,4 +1,4 @@
-import { type Mock as Spy } from 'vitest'
+import type { Mock } from 'vitest'
 import {
   createBehaviorStack,
   type BehaviorStack,
@@ -17,7 +17,7 @@ interface WhenStubImplementation<TFunc extends AnyFunction> {
 export const configureStub = <TFunc extends AnyFunction>(
   maybeSpy: unknown,
 ): BehaviorStack<TFunc> => {
-  const spy = validateSpy<TFunc>(maybeSpy)
+  const spy = validateSpy(maybeSpy)
   const existingBehaviors = getBehaviorStack(spy)
 
   if (existingBehaviors) {
@@ -26,7 +26,7 @@ export const configureStub = <TFunc extends AnyFunction>(
 
   const behaviors = createBehaviorStack<TFunc>()
 
-  const implementation = (...args: Parameters<TFunc>): unknown => {
+  const implementation = (...args: Parameters<TFunc>) => {
     const behavior = behaviors.use(args)?.behavior ?? {
       type: BehaviorType.RETURN,
       value: undefined,
@@ -46,6 +46,7 @@ export const configureStub = <TFunc extends AnyFunction>(
       }
 
       case BehaviorType.REJECT: {
+        // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
         return Promise.reject(behavior.error)
       }
 
@@ -62,9 +63,7 @@ export const configureStub = <TFunc extends AnyFunction>(
   return behaviors
 }
 
-export const validateSpy = <TFunc extends AnyFunction>(
-  maybeSpy: unknown,
-): Spy<Parameters<TFunc>, unknown> => {
+export const validateSpy = (maybeSpy: unknown): Mock => {
   if (
     typeof maybeSpy === 'function' &&
     'mockImplementation' in maybeSpy &&
@@ -74,14 +73,14 @@ export const validateSpy = <TFunc extends AnyFunction>(
     'getMockName' in maybeSpy &&
     typeof maybeSpy.getMockName === 'function'
   ) {
-    return maybeSpy as Spy<Parameters<TFunc>, unknown>
+    return maybeSpy as Mock
   }
 
   throw new NotAMockFunctionError(maybeSpy)
 }
 
 export const getBehaviorStack = <TFunc extends AnyFunction>(
-  spy: Spy,
+  spy: Mock,
 ): BehaviorStack<TFunc> | undefined => {
   const existingImplementation = spy.getMockImplementation() as
     | WhenStubImplementation<TFunc>

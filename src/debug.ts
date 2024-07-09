@@ -23,7 +23,7 @@ export interface Stubbing {
 export const getDebug = <TFunc extends AnyFunction>(
   spy: TFunc,
 ): DebugResult => {
-  const target = validateSpy<TFunc>(spy)
+  const target = validateSpy(spy)
   const name = target.getMockName()
   const behaviors = getBehaviorStack<TFunc>(target)
   const unmatchedCalls = behaviors?.getUnmatchedCalls() ?? target.mock.calls

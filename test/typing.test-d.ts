@@ -23,6 +23,16 @@ describe('vitest-when type signatures', () => {
     assertType<subject.Stub<[number], any>>(stub)
   })
 
+  it('should handle an spied function', () => {
+    const target = { simple }
+    const spy = vi.spyOn(target, 'simple')
+    const stub = subject.when(spy).calledWith(1)
+
+    stub.thenReturn('hello')
+
+    assertType<subject.Stub<[number], any>>(stub)
+  })
+
   it('should handle a simple function', () => {
     const stub = subject.when(simple).calledWith(1)
 

@@ -64,8 +64,7 @@ export const configureStub = <TFunc extends AnyFunction>(
 
 export const validateSpy = (maybeSpy: unknown): MockInstance => {
   if (
-    maybeSpy &&
-    (typeof maybeSpy === 'function' || typeof maybeSpy === 'object') &&
+    typeof maybeSpy === 'function' &&
     'mockImplementation' in maybeSpy &&
     typeof maybeSpy.mockImplementation === 'function' &&
     'getMockImplementation' in maybeSpy &&
@@ -73,7 +72,7 @@ export const validateSpy = (maybeSpy: unknown): MockInstance => {
     'getMockName' in maybeSpy &&
     typeof maybeSpy.getMockName === 'function'
   ) {
-    return maybeSpy as MockInstance
+    return maybeSpy as unknown as MockInstance
   }
 
   throw new NotAMockFunctionError(maybeSpy)

@@ -1,11 +1,10 @@
-import type { Mock } from 'vitest'
 import {
   createBehaviorStack,
   type BehaviorStack,
   BehaviorType,
 } from './behaviors.ts'
 import { NotAMockFunctionError } from './errors.ts'
-import type { AnyFunction } from './types.ts'
+import type { AnyFunction, MockInstance } from './types.ts'
 
 const BEHAVIORS_KEY = Symbol('behaviors')
 
@@ -63,9 +62,10 @@ export const configureStub = <TFunc extends AnyFunction>(
   return behaviors
 }
 
-export const validateSpy = (maybeSpy: unknown): Mock => {
+export const validateSpy = (maybeSpy: unknown): MockInstance => {
   if (
-    typeof maybeSpy === 'function' &&
+    maybeSpy &&
+    (typeof maybeSpy === 'function' || typeof maybeSpy === 'object') &&
     'mockImplementation' in maybeSpy &&
     typeof maybeSpy.mockImplementation === 'function' &&
     'getMockImplementation' in maybeSpy &&
@@ -73,14 +73,14 @@ export const validateSpy = (maybeSpy: unknown): Mock => {
     'getMockName' in maybeSpy &&
     typeof maybeSpy.getMockName === 'function'
   ) {
-    return maybeSpy as Mock
+    return maybeSpy as MockInstance
   }
 
   throw new NotAMockFunctionError(maybeSpy)
 }
 
 export const getBehaviorStack = <TFunc extends AnyFunction>(
-  spy: Mock,
+  spy: MockInstance,
 ): BehaviorStack<TFunc> | undefined => {
   const existingImplementation = spy.getMockImplementation() as
     | WhenStubImplementation<TFunc>

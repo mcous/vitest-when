@@ -1,6 +1,6 @@
 import { configureStub } from './stubs.ts'
 import type { WhenOptions } from './behaviors.ts'
-import type { AnyFunction } from './types.ts'
+import type { AnyFunction, MockInstance } from './types.ts'
 import { getDebug, type DebugResult } from './debug.ts'
 
 export { type WhenOptions, type Behavior, BehaviorType } from './behaviors.ts'
@@ -22,7 +22,7 @@ export interface Stub<TArgs extends unknown[], TReturn> {
 }
 
 export const when = <TFunc extends AnyFunction>(
-  spy: TFunc,
+  spy: TFunc | MockInstance<TFunc>,
   options: WhenOptions = {},
 ): StubWrapper<TFunc> => {
   const behaviorStack = configureStub(spy)

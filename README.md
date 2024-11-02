@@ -186,7 +186,7 @@ export const calculateQuestion = async (answer: number): Promise<string> => {
 
 ### `when(spy: TFunc, options?: WhenOptions): StubWrapper<TFunc>`
 
-Configures a `vi.fn()` mock function to act as a vitest-when stub. Adds an implementation to the function that initially no-ops, and returns an API to configure behaviors for given arguments using [`.calledWith(...)`][called-with]
+Configures a `vi.fn()` or `vi.spyOn()` mock function to act as a vitest-when stub. Adds an implementation to the function that initially no-ops, and returns an API to configure behaviors for given arguments using [`.calledWith(...)`][called-with]
 
 ```ts
 import { vi } from 'vitest'
@@ -263,6 +263,21 @@ when(overloaded).calledWith().thenReturn(null)
 // Manually specified: all good!
 when<() => null>(overloaded).calledWith().thenReturn(null)
 ```
+
+#### Fallback
+
+By default, if arguments do not match, a vitest-when stub will no-op and return `undefined`. You can customize this fallback by configuring your own unconditional behavior on the mock using Vitest's built-in [mock API][].
+
+```ts
+const spy = vi.fn().mockReturnValue('you messed up!')
+
+when(spy).calledWith('hello').thenReturn('world')
+
+spy('hello') // "world"
+spy('jello') // "you messed up!"
+```
+
+[mock API]: https://vitest.dev/api/mock.html
 
 ### `.thenReturn(value: TReturn)`
 

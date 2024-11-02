@@ -47,7 +47,7 @@ export interface DebugOptions {
 }
 
 export const debug = <TFunc extends AnyFunction>(
-  spy: TFunc,
+  spy: TFunc | MockInstance<TFunc>,
   options: DebugOptions = {},
 ): DebugResult => {
   const log = options.log ?? true

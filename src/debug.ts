@@ -4,7 +4,7 @@ import {
 } from 'pretty-format'
 
 import { validateSpy, getBehaviorStack } from './stubs'
-import type { AnyFunction } from './types'
+import type { AnyFunction, MockInstance } from './types'
 import { type Behavior, BehaviorType } from './behaviors'
 
 export interface DebugResult {
@@ -21,11 +21,11 @@ export interface Stubbing {
 }
 
 export const getDebug = <TFunc extends AnyFunction>(
-  spy: TFunc,
+  spy: TFunc | MockInstance<TFunc>,
 ): DebugResult => {
-  const target = validateSpy(spy)
+  const target = validateSpy<TFunc>(spy)
   const name = target.getMockName()
-  const behaviors = getBehaviorStack<TFunc>(target)
+  const behaviors = getBehaviorStack(target)
   const unmatchedCalls = behaviors?.getUnmatchedCalls() ?? target.mock.calls
   const stubbings =
     behaviors?.getAll().map((entry) => ({

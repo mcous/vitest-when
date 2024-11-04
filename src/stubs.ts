@@ -16,7 +16,7 @@ interface WhenStubImplementation<TFunc extends AnyFunction> {
 export const configureStub = <TFunc extends AnyFunction>(
   maybeSpy: unknown,
 ): BehaviorStack<TFunc> => {
-  const spy = validateSpy(maybeSpy)
+  const spy = validateSpy<TFunc>(maybeSpy)
   const existingBehaviors = getBehaviorStack(spy)
 
   if (existingBehaviors) {
@@ -24,11 +24,12 @@ export const configureStub = <TFunc extends AnyFunction>(
   }
 
   const behaviors = createBehaviorStack<TFunc>()
+  const fallbackImplementation = spy.getMockImplementation()
 
   const implementation = (...args: Parameters<TFunc>) => {
     const behavior = behaviors.use(args)?.behavior ?? {
-      type: BehaviorType.RETURN,
-      value: undefined,
+      type: BehaviorType.DO,
+      callback: fallbackImplementation,
     }
 
     switch (behavior.type) {
@@ -50,19 +51,21 @@ export const configureStub = <TFunc extends AnyFunction>(
       }
 
       case BehaviorType.DO: {
-        return behavior.callback(...args)
+        return behavior.callback?.(...args)
       }
     }
   }
 
   spy.mockImplementation(
-    Object.assign(implementation, { [BEHAVIORS_KEY]: behaviors }),
+    Object.assign(implementation as TFunc, { [BEHAVIORS_KEY]: behaviors }),
   )
 
   return behaviors
 }
 
-export const validateSpy = (maybeSpy: unknown): MockInstance => {
+export const validateSpy = <TFunc extends AnyFunction>(
+  maybeSpy: unknown,
+): MockInstance<TFunc> => {
   if (
     typeof maybeSpy === 'function' &&
     'mockImplementation' in maybeSpy &&
@@ -72,14 +75,14 @@ export const validateSpy = (maybeSpy: unknown): MockInstance => {
     'getMockName' in maybeSpy &&
     typeof maybeSpy.getMockName === 'function'
   ) {
-    return maybeSpy as unknown as MockInstance
+    return maybeSpy as unknown as MockInstance<TFunc>
   }
 
   throw new NotAMockFunctionError(maybeSpy)
 }
 
 export const getBehaviorStack = <TFunc extends AnyFunction>(
-  spy: MockInstance,
+  spy: MockInstance<TFunc>,
 ): BehaviorStack<TFunc> | undefined => {
   const existingImplementation = spy.getMockImplementation() as
     | WhenStubImplementation<TFunc>

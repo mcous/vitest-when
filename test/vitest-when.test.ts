@@ -55,6 +55,15 @@ describe('vitest-when', () => {
     expect(spy(1, 2, 3)).toEqual(undefined)
   })
 
+  it('should fall back to original mock implementation', () => {
+    const spy = vi.fn().mockReturnValue(100)
+
+    subject.when(spy).calledWith(1, 2, 3).thenReturn(4)
+
+    expect(spy(1, 2, 3)).toEqual(4)
+    expect(spy()).toEqual(100)
+  })
+
   it('should return a number of times', () => {
     const spy = vi.fn()
 

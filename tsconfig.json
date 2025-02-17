@@ -6,9 +6,10 @@
     "target": "es2021",
     "noEmit": true,
     "allowImportingTsExtensions": true,
+    "types": ["node"],
     "paths": {
       "vitest-when": ["./src/vitest-when.ts"]
     }
   },
-  "include": ["vitest.config.ts", "src", "test", "example"]
+  "include": ["eslint.config.js", "vitest.config.ts", "src", "test", "example"]
 }

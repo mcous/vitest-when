@@ -3,9 +3,9 @@ import {
   plugins as prettyFormatPlugins,
 } from 'pretty-format'
 
-import { validateSpy, getBehaviorStack } from './stubs'
-import type { AnyFunction, MockInstance } from './types'
 import { type Behavior, BehaviorType } from './behaviors'
+import { getBehaviorStack, validateSpy } from './stubs'
+import type { AnyFunction, MockInstance } from './types'
 
 export interface DebugResult {
   name: string

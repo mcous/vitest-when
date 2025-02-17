@@ -1,0 +1,4 @@
+dictionaries = ["en_us"]
+words = ["mcous"]
+flag_words = []
+ignore_paths = []

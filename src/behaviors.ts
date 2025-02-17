@@ -1,4 +1,5 @@
 import { equals } from '@vitest/expect'
+
 import type { AnyFunction } from './types.ts'
 
 export interface WhenOptions {
@@ -12,8 +13,8 @@ export interface BehaviorStack<TFunc extends AnyFunction> {
 
   getUnmatchedCalls: () => readonly Parameters<TFunc>[]
 
-  bindArgs: <TArgs extends Parameters<TFunc>>(
-    args: TArgs,
+  bindArgs: (
+    args: Parameters<TFunc>,
     options: WhenOptions,
   ) => BoundBehaviorStack<ReturnType<TFunc>>
 }

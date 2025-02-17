@@ -1,9 +1,9 @@
-import { configureStub } from './stubs.ts'
 import type { WhenOptions } from './behaviors.ts'
+import { type DebugResult, getDebug } from './debug.ts'
+import { configureStub } from './stubs.ts'
 import type { AnyFunction, MockInstance } from './types.ts'
-import { getDebug, type DebugResult } from './debug.ts'
 
-export { type WhenOptions, type Behavior, BehaviorType } from './behaviors.ts'
+export { type Behavior, BehaviorType, type WhenOptions } from './behaviors.ts'
 export type { DebugResult, Stubbing } from './debug.ts'
 export * from './errors.ts'
 

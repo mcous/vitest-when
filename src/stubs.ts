@@ -1,7 +1,7 @@
 import {
-  createBehaviorStack,
   type BehaviorStack,
   BehaviorType,
+  createBehaviorStack,
 } from './behaviors.ts'
 import { NotAMockFunctionError } from './errors.ts'
 import type { AnyFunction, MockInstance } from './types.ts'

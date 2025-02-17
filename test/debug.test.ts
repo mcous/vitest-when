@@ -1,4 +1,4 @@
-import { vi, describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import * as subject from '../src/vitest-when.ts'
 

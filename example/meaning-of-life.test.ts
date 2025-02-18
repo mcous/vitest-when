@@ -1,5 +1,5 @@
-import { vi, describe, afterEach, it, expect } from 'vitest'
-import { when, debug } from 'vitest-when'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { debug, when } from 'vitest-when'
 
 import * as deepThought from './deep-thought.ts'
 import * as earth from './earth.ts'

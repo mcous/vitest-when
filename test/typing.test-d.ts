@@ -1,10 +1,10 @@
 /* eslint-disable
   @typescript-eslint/no-explicit-any,
-  @typescript-eslint/restrict-template-expressions,
-  func-style
+  @typescript-eslint/restrict-template-expressions
 */
 
-import { vi, describe, it, assertType } from 'vitest'
+import { assertType, describe, it, vi } from 'vitest'
+
 import * as subject from '../src/vitest-when.ts'
 
 describe('vitest-when type signatures', () => {
@@ -96,6 +96,7 @@ function simple(input: number): string {
   throw new Error(`simple(${input})`)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 function generic<T>(input: T): string {
   throw new Error(`generic(${input})`)
 }

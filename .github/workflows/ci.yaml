@@ -2,10 +2,10 @@ name: ci
 
 on:
   pull_request:
-    branches: main
+    branches: [main]
   push:
-    branches: main
-    tags: v*
+    branches: [main]
+    tags: [v*]
 
 jobs:
   test:
@@ -16,11 +16,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        node-version: ['18', '20']
+        node-version: ['18', '20', '22']
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Node.js and dependencies
         uses: mcous/js/actions/setup@main
@@ -31,7 +31,7 @@ jobs:
         run: pnpm coverage
 
       - name: Upload coverage
-        uses: coverallsapp/github-action@f350da2c033043742f89e8c0b7b5145a1616da6d
+        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b
         with:
           flag-name: node-${{ matrix.node-version }}-os-${{ matrix.os }}
           parallel: true
@@ -42,7 +42,7 @@ jobs:
     needs: test
 
     steps:
-      - uses: coverallsapp/github-action@f350da2c033043742f89e8c0b7b5145a1616da6d
+      - uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b
         with:
           parallel-finished: true
 
@@ -52,7 +52,7 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Node.js and dependencies
         uses: mcous/js/actions/setup@main
@@ -61,7 +61,7 @@ jobs:
         run: pnpm build-and-check
 
       - name: Upload publish artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: npm-dist
           path: dist
@@ -78,16 +78,16 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           registry-url: https://registry.npmjs.org
 
       - name: Download publish artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: npm-dist
           path: dist

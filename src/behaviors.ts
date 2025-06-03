@@ -1,6 +1,6 @@
 import { equals } from '@vitest/expect'
 
-import type { AnyFunction } from './types.ts'
+import type { AnyFunction, WithMatchers } from './types.ts'
 
 export interface WhenOptions {
   times?: number
@@ -14,7 +14,7 @@ export interface BehaviorStack<TFunc extends AnyFunction> {
   getUnmatchedCalls: () => readonly Parameters<TFunc>[]
 
   bindArgs: (
-    args: Parameters<TFunc>,
+    args: WithMatchers<Parameters<TFunc>>,
     options: WhenOptions,
   ) => BoundBehaviorStack<ReturnType<TFunc>>
 }
@@ -28,7 +28,7 @@ export interface BoundBehaviorStack<TReturn> {
 }
 
 export interface BehaviorEntry<TArgs extends unknown[]> {
-  args: TArgs
+  args: WithMatchers<TArgs>
   behavior: Behavior
   calls: TArgs[]
   maxCallCount?: number | undefined

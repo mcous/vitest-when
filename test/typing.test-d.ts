@@ -3,7 +3,7 @@
   @typescript-eslint/restrict-template-expressions
 */
 
-import { assertType, describe, it, vi } from 'vitest'
+import { assertType, describe, expect, it, vi } from 'vitest'
 
 import * as subject from '../src/vitest-when.ts'
 
@@ -86,6 +86,11 @@ describe('vitest-when type signatures', () => {
     // @ts-expect-error: return wrong type
     subject.when(generic).calledWith(1).thenReturn(42)
   })
+
+  it('should accept asymmetric matchers', () => {
+    subject.when(simple).calledWith(expect.any(Number))
+    subject.when(complex).calledWith(expect.objectContaining({ a: 1 }))
+  })
 })
 
 function untyped(...args: any[]): any {
@@ -94,6 +99,10 @@ function untyped(...args: any[]): any {
 
 function simple(input: number): string {
   throw new Error(`simple(${input})`)
+}
+
+function complex(input: { a: number; b: string }): string {
+  throw new Error(`simple({ a: ${input.a}, b: ${input.b} })`)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters

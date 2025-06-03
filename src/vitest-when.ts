@@ -1,7 +1,7 @@
 import type { WhenOptions } from './behaviors.ts'
 import { type DebugResult, getDebug } from './debug.ts'
 import { configureStub } from './stubs.ts'
-import type { AnyFunction, MockInstance } from './types.ts'
+import type { AnyFunction, MockInstance, WithMatchers } from './types.ts'
 
 export { type Behavior, BehaviorType, type WhenOptions } from './behaviors.ts'
 export type { DebugResult, Stubbing } from './debug.ts'
@@ -9,7 +9,7 @@ export * from './errors.ts'
 
 export interface StubWrapper<TFunc extends AnyFunction> {
   calledWith<TArgs extends Parameters<TFunc>>(
-    ...args: TArgs
+    ...args: WithMatchers<TArgs>
   ): Stub<TArgs, ReturnType<TFunc>>
 }
 

@@ -5,7 +5,7 @@ import {
 
 import { type Behavior, BehaviorType } from './behaviors'
 import { getBehaviorStack, validateSpy } from './stubs'
-import type { AnyFunction, MockInstance } from './types'
+import type { AnyCallable, MockInstance } from './types'
 
 export interface DebugResult {
   name: string
@@ -20,7 +20,7 @@ export interface Stubbing {
   calls: readonly unknown[][]
 }
 
-export const getDebug = <TFunc extends AnyFunction>(
+export const getDebug = <TFunc extends AnyCallable>(
   spy: TFunc | MockInstance<TFunc>,
 ): DebugResult => {
   const target = validateSpy<TFunc>(spy)

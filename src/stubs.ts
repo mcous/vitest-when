@@ -4,16 +4,21 @@ import {
   createBehaviorStack,
 } from './behaviors.ts'
 import { NotAMockFunctionError } from './errors.ts'
-import type { AnyFunction, MockInstance } from './types.ts'
+import type {
+  AnyCallable,
+  AnyFunction,
+  ExtractParameters,
+  MockInstance,
+} from './types.ts'
 
 const BEHAVIORS_KEY = Symbol('behaviors')
 
-interface WhenStubImplementation<TFunc extends AnyFunction> {
-  (...args: Parameters<TFunc>): unknown
+interface WhenStubImplementation<TFunc extends AnyCallable> {
+  (...args: ExtractParameters<TFunc>): unknown
   [BEHAVIORS_KEY]: BehaviorStack<TFunc>
 }
 
-export const configureStub = <TFunc extends AnyFunction>(
+export const configureStub = <TFunc extends AnyCallable>(
   maybeSpy: unknown,
 ): BehaviorStack<TFunc> => {
   const spy = validateSpy<TFunc>(maybeSpy)
@@ -26,10 +31,10 @@ export const configureStub = <TFunc extends AnyFunction>(
   const behaviors = createBehaviorStack<TFunc>()
   const fallbackImplementation = spy.getMockImplementation()
 
-  const implementation = (...args: Parameters<TFunc>) => {
+  const implementation = (...args: ExtractParameters<TFunc>) => {
     const behavior = behaviors.use(args)?.behavior ?? {
       type: BehaviorType.DO,
-      callback: fallbackImplementation,
+      callback: fallbackImplementation as AnyFunction | undefined,
     }
 
     switch (behavior.type) {
@@ -63,7 +68,7 @@ export const configureStub = <TFunc extends AnyFunction>(
   return behaviors
 }
 
-export const validateSpy = <TFunc extends AnyFunction>(
+export const validateSpy = <TFunc extends AnyCallable>(
   maybeSpy: unknown,
 ): MockInstance<TFunc> => {
   if (
@@ -81,7 +86,7 @@ export const validateSpy = <TFunc extends AnyFunction>(
   throw new NotAMockFunctionError(maybeSpy)
 }
 
-export const getBehaviorStack = <TFunc extends AnyFunction>(
+export const getBehaviorStack = <TFunc extends AnyCallable>(
   spy: MockInstance<TFunc>,
 ): BehaviorStack<TFunc> | undefined => {
   const existingImplementation = spy.getMockImplementation() as

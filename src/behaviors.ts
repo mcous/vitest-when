@@ -1,22 +1,30 @@
 import { equals } from '@vitest/expect'
 
-import type { AnyFunction, WithMatchers } from './types.ts'
+import type {
+  AnyCallable,
+  AnyFunction,
+  ExtractParameters,
+  ExtractReturnType,
+  WithMatchers,
+} from './types.ts'
 
 export interface WhenOptions {
   times?: number
 }
 
-export interface BehaviorStack<TFunc extends AnyFunction> {
-  use: (args: Parameters<TFunc>) => BehaviorEntry<Parameters<TFunc>> | undefined
+export interface BehaviorStack<TFunc extends AnyCallable> {
+  use: (
+    args: ExtractParameters<TFunc>,
+  ) => BehaviorEntry<ExtractParameters<TFunc>> | undefined
 
-  getAll: () => readonly BehaviorEntry<Parameters<TFunc>>[]
+  getAll: () => readonly BehaviorEntry<ExtractParameters<TFunc>>[]
 
-  getUnmatchedCalls: () => readonly Parameters<TFunc>[]
+  getUnmatchedCalls: () => readonly ExtractParameters<TFunc>[]
 
   bindArgs: (
-    args: WithMatchers<Parameters<TFunc>>,
+    args: WithMatchers<ExtractParameters<TFunc>>,
     options: WhenOptions,
-  ) => BoundBehaviorStack<ReturnType<TFunc>>
+  ) => BoundBehaviorStack<ExtractReturnType<TFunc>>
 }
 
 export interface BoundBehaviorStack<TReturn> {
@@ -55,10 +63,10 @@ export interface BehaviorOptions<TValue> {
 }
 
 export const createBehaviorStack = <
-  TFunc extends AnyFunction,
+  TFunc extends AnyCallable,
 >(): BehaviorStack<TFunc> => {
-  const behaviors: BehaviorEntry<Parameters<TFunc>>[] = []
-  const unmatchedCalls: Parameters<TFunc>[] = []
+  const behaviors: BehaviorEntry<ExtractParameters<TFunc>>[] = []
+  const unmatchedCalls: ExtractParameters<TFunc>[] = []
 
   return {
     getAll: () => behaviors,

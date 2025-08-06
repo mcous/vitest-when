@@ -91,6 +91,20 @@ describe('vitest-when type signatures', () => {
     subject.when(simple).calledWith(expect.any(Number))
     subject.when(complex).calledWith(expect.objectContaining({ a: 1 }))
   })
+
+  it('should accept a class constructor', () => {
+    // eslint-disable-next-line @typescript-eslint/no-extraneous-class
+    class TestClass {
+      constructor(input: number) {
+        throw new Error(`TestClass(${input})`)
+      }
+    }
+
+    subject.when(TestClass).calledWith(42)
+
+    // @ts-expect-error: args wrong type
+    subject.when(TestClass).calledWith('42')
+  })
 })
 
 function untyped(...args: any[]): any {

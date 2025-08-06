@@ -1,16 +1,22 @@
 import type { WhenOptions } from './behaviors.ts'
 import { type DebugResult, getDebug } from './debug.ts'
 import { configureStub } from './stubs.ts'
-import type { AnyFunction, MockInstance, WithMatchers } from './types.ts'
+import type {
+  AnyCallable,
+  ExtractParameters,
+  ExtractReturnType,
+  MockInstance,
+  WithMatchers,
+} from './types.ts'
 
 export { type Behavior, BehaviorType, type WhenOptions } from './behaviors.ts'
 export type { DebugResult, Stubbing } from './debug.ts'
 export * from './errors.ts'
 
-export interface StubWrapper<TFunc extends AnyFunction> {
-  calledWith<TArgs extends Parameters<TFunc>>(
+export interface StubWrapper<TFunc extends AnyCallable> {
+  calledWith<TArgs extends ExtractParameters<TFunc>>(
     ...args: WithMatchers<TArgs>
-  ): Stub<TArgs, ReturnType<TFunc>>
+  ): Stub<TArgs, ExtractReturnType<TFunc>>
 }
 
 export interface Stub<TArgs extends unknown[], TReturn> {
@@ -21,7 +27,7 @@ export interface Stub<TArgs extends unknown[], TReturn> {
   thenDo: (...callbacks: ((...args: TArgs) => TReturn)[]) => void
 }
 
-export const when = <TFunc extends AnyFunction>(
+export const when = <TFunc extends AnyCallable>(
   spy: TFunc | MockInstance<TFunc>,
   options: WhenOptions = {},
 ): StubWrapper<TFunc> => {
@@ -46,7 +52,7 @@ export interface DebugOptions {
   log?: boolean
 }
 
-export const debug = <TFunc extends AnyFunction>(
+export const debug = <TFunc extends AnyCallable>(
   spy: TFunc | MockInstance<TFunc>,
   options: DebugOptions = {},
 ): DebugResult => {

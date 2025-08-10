@@ -27,9 +27,7 @@ describe('vitest-when', () => {
   })
 
   it('should return undefined by default', () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenReturn(4)
+    const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenReturn(4)
 
     expect(spy()).toEqual(undefined)
     expect(spy(1)).toEqual(undefined)
@@ -39,26 +37,23 @@ describe('vitest-when', () => {
   })
 
   it('should return a value', () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenReturn(4)
+    const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenReturn(4)
 
     expect(spy(1, 2, 3)).toEqual(4)
     expect(spy(1, 2, 3)).toEqual(4)
   })
 
   it('should return undefined if passed nothing', () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenReturn()
+    const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenReturn()
 
     expect(spy(1, 2, 3)).toEqual(undefined)
   })
 
   it('should fall back to original mock implementation', () => {
-    const spy = vi.fn().mockReturnValue(100)
-
-    subject.when(spy).calledWith(1, 2, 3).thenReturn(4)
+    const spy = subject
+      .when(vi.fn().mockReturnValue(100))
+      .calledWith(1, 2, 3)
+      .thenReturn(4)
 
     expect(spy(1, 2, 3)).toEqual(4)
     expect(spy()).toEqual(100)
@@ -76,9 +71,10 @@ describe('vitest-when', () => {
   })
 
   it('should return a number of times', () => {
-    const spy = vi.fn()
-
-    subject.when(spy, { times: 2 }).calledWith(1, 2, 3).thenReturn(4)
+    const spy = subject
+      .when(vi.fn(), { times: 2 })
+      .calledWith(1, 2, 3)
+      .thenReturn(4)
 
     expect(spy(1, 2, 3)).toEqual(4)
     expect(spy(1, 2, 3)).toEqual(4)
@@ -86,18 +82,17 @@ describe('vitest-when', () => {
   })
 
   it('should be resettable', () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenReturn(4)
+    const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenReturn(4)
     vi.resetAllMocks()
 
     expect(spy(1, 2, 3)).toEqual(undefined)
   })
 
   it('should throw an error', () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenThrow(new Error('oh no'))
+    const spy = subject
+      .when(vi.fn())
+      .calledWith(1, 2, 3)
+      .thenThrow(new Error('oh no'))
 
     expect(() => {
       spy(1, 2, 3)
@@ -105,34 +100,29 @@ describe('vitest-when', () => {
   })
 
   it('should resolve a Promise', async () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenResolve(4)
+    const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenResolve(4)
 
     await expect(spy(1, 2, 3)).resolves.toEqual(4)
   })
 
   it('should resolve undefined if passed nothing', async () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenResolve()
+    const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenResolve()
 
     await expect(spy(1, 2, 3)).resolves.toEqual(undefined)
   })
 
   it('should reject a Promise', async () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenReject(new Error('oh no'))
+    const spy = subject
+      .when(vi.fn())
+      .calledWith(1, 2, 3)
+      .thenReject(new Error('oh no'))
 
     await expect(spy(1, 2, 3)).rejects.toThrow('oh no')
   })
 
   it('should do a callback', () => {
-    const spy = vi.fn()
     const callback = vi.fn(() => 4)
-
-    subject.when(spy).calledWith(1, 2, 3).thenDo(callback)
+    const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenDo(callback)
 
     expect(spy(1, 2, 3)).toEqual(4)
     expect(callback).toHaveBeenCalledWith(1, 2, 3)
@@ -140,9 +130,7 @@ describe('vitest-when', () => {
   })
 
   it('should return multiple values', () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenReturn(4, 5, 6)
+    const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenReturn(4, 5, 6)
 
     expect(spy(1, 2, 3)).toEqual(4)
     expect(spy(1, 2, 3)).toEqual(5)
@@ -151,9 +139,7 @@ describe('vitest-when', () => {
   })
 
   it('should resolve multiple values', async () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenResolve(4, 5, 6)
+    const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenResolve(4, 5, 6)
 
     await expect(spy(1, 2, 3)).resolves.toEqual(4)
     await expect(spy(1, 2, 3)).resolves.toEqual(5)
@@ -162,10 +148,8 @@ describe('vitest-when', () => {
   })
 
   it('should reject multiple errors', async () => {
-    const spy = vi.fn()
-
-    subject
-      .when(spy)
+    const spy = subject
+      .when(vi.fn())
       .calledWith(1, 2, 3)
       .thenReject(new Error('4'), new Error('5'), new Error('6'))
 
@@ -176,10 +160,8 @@ describe('vitest-when', () => {
   })
 
   it('should reject a number of times', async () => {
-    const spy = vi.fn()
-
-    subject
-      .when(spy, { times: 2 })
+    const spy = subject
+      .when(vi.fn(), { times: 2 })
       .calledWith(1, 2, 3)
       .thenReject(new Error('4'))
 
@@ -189,32 +171,31 @@ describe('vitest-when', () => {
   })
 
   it('should throw multiple errors', () => {
-    const spy = vi.fn()
-
-    subject
-      .when(spy)
+    const spy = subject
+      .when(vi.fn())
       .calledWith(1, 2, 3)
       .thenThrow(new Error('4'), new Error('5'), new Error('6'))
 
     expect(() => {
       spy(1, 2, 3)
     }).toThrow('4')
+
     expect(() => {
       spy(1, 2, 3)
     }).toThrow('5')
+
     expect(() => {
       spy(1, 2, 3)
     }).toThrow('6')
+
     expect(() => {
       spy(1, 2, 3)
     }).toThrow('6')
   })
 
   it('should call multiple callbacks', () => {
-    const spy = vi.fn()
-
-    subject
-      .when(spy)
+    const spy = subject
+      .when(vi.fn())
       .calledWith(1, 2, 3)
       .thenDo(
         () => 4,
@@ -229,9 +210,7 @@ describe('vitest-when', () => {
   })
 
   it('should allow multiple different stubs', () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenReturn(4)
+    const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenReturn(4)
     subject.when(spy).calledWith(4, 5, 6).thenReturn(7)
 
     expect(spy(1, 2, 3)).toEqual(4)
@@ -239,19 +218,15 @@ describe('vitest-when', () => {
   })
 
   it('should use the latest stub', () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(1, 2, 3).thenReturn(4)
+    const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenReturn(4)
     subject.when(spy).calledWith(1, 2, 3).thenReturn(1000)
 
     expect(spy(1, 2, 3)).toEqual(1000)
   })
 
   it('should respect asymmetric matchers', () => {
-    const spy = vi.fn()
-
-    subject
-      .when(spy)
+    const spy = subject
+      .when(vi.fn())
       .calledWith(expect.stringContaining('foo'))
       .thenReturn(1000)
 
@@ -259,18 +234,17 @@ describe('vitest-when', () => {
   })
 
   it('should respect custom asymmetric matchers', () => {
-    const spy = vi.fn()
-
-    subject.when(spy).calledWith(expect.toBeFoo()).thenReturn(1000)
+    const spy = subject
+      .when(vi.fn())
+      .calledWith(expect.toBeFoo())
+      .thenReturn(1000)
 
     expect(spy('foo')).toEqual(1000)
   })
 
   it('should deeply check object arguments', () => {
-    const spy = vi.fn()
-
-    subject
-      .when(spy)
+    const spy = subject
+      .when(vi.fn())
       .calledWith({ foo: { bar: { baz: 0 } } })
       .thenReturn(100)
 
@@ -278,9 +252,9 @@ describe('vitest-when', () => {
   })
 
   it('should not trigger unhandled rejection warnings when rejection unused', () => {
-    const spy = vi.fn()
     const error = new Error('uh uhh')
-    subject.when(spy).calledWith('/api/foo').thenReject(error)
+    subject.when(vi.fn()).calledWith('/api/foo').thenReject(error)
+
     // intentionally do not call the spy
     expect(true).toBe(true)
   })

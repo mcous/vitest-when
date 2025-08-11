@@ -13,11 +13,6 @@ interface WhenStubImplementation<TFunc extends AnyCallable> {
   [BEHAVIORS_KEY]: BehaviorStack<TFunc>
 }
 
-export interface ConfiguredStub<TFunc extends AnyCallable> {
-  mock: Mock<TFunc>
-  behaviorStack: BehaviorStack<TFunc>
-}
-
 export const configureMock = <TFunc extends AnyCallable>(
   mock: Mock<TFunc>,
 ): BehaviorStack<TFunc> => {

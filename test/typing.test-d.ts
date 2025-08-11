@@ -1,68 +1,109 @@
 /* eslint-disable
+  @typescript-eslint/require-await,
   @typescript-eslint/no-explicit-any,
   @typescript-eslint/restrict-template-expressions
 */
 
-import { assertType, describe, expect, it, vi } from 'vitest'
+import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 
 import * as subject from '../src/vitest-when.ts'
 
 describe('vitest-when type signatures', () => {
   it('should handle an anonymous mock', () => {
-    const spy = vi.fn()
-    const stub = subject.when(spy).calledWith(1, 2, 3)
+    const result = subject.when(vi.fn()).calledWith(1, 2, 3).thenReturn(4)
 
-    assertType<subject.Stub<[number, number, number], any>>(stub)
+    expectTypeOf(result).parameters.toEqualTypeOf<any[]>()
+    expectTypeOf(result).returns.toEqualTypeOf<any>()
+    expectTypeOf(result.mock.calls).toEqualTypeOf<any[][]>()
   })
 
   it('should handle an untyped function', () => {
-    const stub = subject.when(untyped).calledWith(1)
+    const result = subject.when(untyped).calledWith(1).thenReturn('hello')
 
-    stub.thenReturn('hello')
+    expectTypeOf(result.mock.calls).toEqualTypeOf<any[][]>()
+    expectTypeOf(result).parameters.toEqualTypeOf<any[]>()
+    expectTypeOf(result).returns.toEqualTypeOf<any>()
+  })
 
-    assertType<subject.Stub<[number], any>>(stub)
+  it('should handle a simple function', () => {
+    const result = subject.when(simple).calledWith(1).thenReturn('hello')
+
+    expectTypeOf(result.mock.calls).toEqualTypeOf<[number][]>()
+    expectTypeOf(result).parameters.toEqualTypeOf<[number]>()
+    expectTypeOf(result).returns.toEqualTypeOf<string>()
+  })
+
+  it('returns mock type for then resolve', () => {
+    const result = subject.when(simpleAsync).calledWith(1).thenResolve('hello')
+
+    expectTypeOf(result.mock.calls).toEqualTypeOf<[number][]>()
+    expectTypeOf(result).parameters.toEqualTypeOf<[number]>()
+    expectTypeOf(result).returns.toEqualTypeOf<Promise<string>>()
+  })
+
+  it('returns mock type for then throw', () => {
+    const result = subject.when(simple).calledWith(1).thenThrow('oh no')
+
+    expectTypeOf(result.mock.calls).toEqualTypeOf<[number][]>()
+    expectTypeOf(result).parameters.toEqualTypeOf<[number]>()
+    expectTypeOf(result).returns.toEqualTypeOf<string>()
+  })
+
+  it('returns mock type for then reject', () => {
+    const result = subject.when(simpleAsync).calledWith(1).thenReject('oh no')
+
+    expectTypeOf(result.mock.calls).toEqualTypeOf<[number][]>()
+    expectTypeOf(result).parameters.toEqualTypeOf<[number]>()
+    expectTypeOf(result).returns.toEqualTypeOf<Promise<string>>()
+  })
+
+  it('returns mock type for then do', () => {
+    const result = subject
+      .when(simple)
+      .calledWith(1)
+      .thenDo(() => 'hello')
+
+    expectTypeOf(result.mock.calls).toEqualTypeOf<[number][]>()
+    expectTypeOf(result).parameters.toEqualTypeOf<[number]>()
+    expectTypeOf(result).returns.toEqualTypeOf<string>()
   })
 
   it('should handle an spied function', () => {
     const target = { simple }
-    const spy = vi.spyOn(target, 'simple')
-    const stub = subject.when(spy).calledWith(1)
+    vi.spyOn(target, 'simple')
 
-    stub.thenReturn('hello')
+    const result = subject.when(target.simple).calledWith(1).thenReturn('hello')
 
-    assertType<subject.Stub<[number], any>>(stub)
-  })
-
-  it('should handle a simple function', () => {
-    const stub = subject.when(simple).calledWith(1)
-
-    stub.thenReturn('hello')
-
-    assertType<subject.Stub<[1], string>>(stub)
+    expectTypeOf(result.mock.calls).toEqualTypeOf<[number][]>()
+    expectTypeOf(result).parameters.toEqualTypeOf<[number]>()
+    expectTypeOf(result).returns.toEqualTypeOf<string>()
   })
 
   it('should handle a generic function', () => {
-    const stub = subject.when(generic).calledWith(1)
+    const result = subject.when(generic).calledWith(1).thenReturn('hello')
 
-    stub.thenReturn('hello')
-
-    assertType<subject.Stub<[number], string>>(stub)
+    expectTypeOf(result.mock.calls).toEqualTypeOf<[unknown][]>()
+    expectTypeOf(result).parameters.toEqualTypeOf<[unknown]>()
+    expectTypeOf(result).returns.toEqualTypeOf<string>()
   })
 
   it('should handle an overloaded function using its last overload', () => {
-    const stub = subject.when(overloaded).calledWith(1)
+    const result = subject.when(overloaded).calledWith(1).thenReturn('hello')
 
-    stub.thenReturn('hello')
-
-    assertType<subject.Stub<[1], string>>(stub)
+    expectTypeOf(result.mock.calls).toEqualTypeOf<[number][]>()
+    expectTypeOf(result).parameters.toEqualTypeOf<[number]>()
+    expectTypeOf(result).returns.toEqualTypeOf<string>()
   })
 
   it('should handle an overloaded function using an explicit type', () => {
-    const stub = subject.when<() => boolean>(overloaded).calledWith()
+    const result = subject
+      .when<() => boolean>(overloaded)
+      .calledWith()
+      .thenReturn(true)
 
-    stub.thenReturn(true)
-
-    assertType<subject.Stub<[], boolean>>(stub)
+    expectTypeOf(result.mock.calls).toEqualTypeOf<[][]>()
+    expectTypeOf(result).parameters.toEqualTypeOf<[]>()
+    expectTypeOf(result).returns.toEqualTypeOf<boolean>()
   })
 
   it('should reject invalid usage of a simple function', () => {
@@ -100,7 +141,13 @@ describe('vitest-when type signatures', () => {
       }
     }
 
-    subject.when(TestClass).calledWith(42)
+    const result = subject
+      .when(TestClass)
+      .calledWith(42)
+      .thenReturn({} as TestClass)
+
+    expectTypeOf(result.mock.instances).toEqualTypeOf<TestClass[]>()
+    expectTypeOf(result).constructorParameters.toEqualTypeOf<[number]>()
 
     // @ts-expect-error: args wrong type
     subject.when(TestClass).calledWith('42')
@@ -113,6 +160,10 @@ function untyped(...args: any[]): any {
 
 function simple(input: number): string {
   throw new Error(`simple(${input})`)
+}
+
+async function simpleAsync(input: number): Promise<string> {
+  throw new Error(`simpleAsync(${input})`)
 }
 
 function complex(input: { a: number; b: string }): string {

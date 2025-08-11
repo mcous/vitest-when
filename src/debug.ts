@@ -3,9 +3,9 @@ import {
   plugins as prettyFormatPlugins,
 } from 'pretty-format'
 
-import { type Behavior, BehaviorType } from './behaviors'
-import { getBehaviorStack, validateSpy } from './stubs'
-import type { AnyCallable, MockInstance } from './types'
+import { type Behavior, BehaviorType } from './behaviors.ts'
+import { getBehaviorStack } from './stubs.ts'
+import type { AnyCallable, Mock } from './types.ts'
 
 export interface DebugResult {
   name: string
@@ -21,12 +21,11 @@ export interface Stubbing {
 }
 
 export const getDebug = <TFunc extends AnyCallable>(
-  spy: TFunc | MockInstance<TFunc>,
+  mock: Mock<TFunc>,
 ): DebugResult => {
-  const target = validateSpy<TFunc>(spy)
-  const name = target.getMockName()
-  const behaviors = getBehaviorStack(target)
-  const unmatchedCalls = behaviors?.getUnmatchedCalls() ?? target.mock.calls
+  const name = mock.getMockName()
+  const behaviors = getBehaviorStack(mock)
+  const unmatchedCalls = behaviors?.getUnmatchedCalls() ?? mock.mock.calls
   const stubbings =
     behaviors?.getAll().map((entry) => ({
       args: entry.args,

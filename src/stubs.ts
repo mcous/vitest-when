@@ -4,35 +4,29 @@ import {
   createBehaviorStack,
 } from './behaviors.ts'
 import { NotAMockFunctionError } from './errors.ts'
-import type {
-  AnyCallable,
-  AnyFunction,
-  ExtractParameters,
-  MockInstance,
-} from './types.ts'
+import type { AnyCallable, AnyFunction, Mock, ParametersOf } from './types.ts'
 
 const BEHAVIORS_KEY = Symbol('behaviors')
 
 interface WhenStubImplementation<TFunc extends AnyCallable> {
-  (...args: ExtractParameters<TFunc>): unknown
+  (...args: ParametersOf<TFunc>): unknown
   [BEHAVIORS_KEY]: BehaviorStack<TFunc>
 }
 
-export const configureStub = <TFunc extends AnyCallable>(
-  maybeSpy: unknown,
+export const configureMock = <TFunc extends AnyCallable>(
+  mock: Mock<TFunc>,
 ): BehaviorStack<TFunc> => {
-  const spy = validateSpy<TFunc>(maybeSpy)
-  const existingBehaviors = getBehaviorStack(spy)
+  const existingBehaviorStack = getBehaviorStack(mock)
 
-  if (existingBehaviors) {
-    return existingBehaviors
+  if (existingBehaviorStack) {
+    return existingBehaviorStack
   }
 
-  const behaviors = createBehaviorStack<TFunc>()
-  const fallbackImplementation = spy.getMockImplementation()
+  const behaviorStack = createBehaviorStack<TFunc>()
+  const fallbackImplementation = mock.getMockImplementation()
 
-  const implementation = (...args: ExtractParameters<TFunc>) => {
-    const behavior = behaviors.use(args)?.behavior ?? {
+  const implementation = (...args: ParametersOf<TFunc>) => {
+    const behavior = behaviorStack.use(args)?.behavior ?? {
       type: BehaviorType.DO,
       callback: fallbackImplementation as AnyFunction | undefined,
     }
@@ -61,35 +55,31 @@ export const configureStub = <TFunc extends AnyCallable>(
     }
   }
 
-  spy.mockImplementation(
-    Object.assign(implementation as TFunc, { [BEHAVIORS_KEY]: behaviors }),
+  mock.mockImplementation(
+    Object.assign(implementation, { [BEHAVIORS_KEY]: behaviorStack }),
   )
 
-  return behaviors
+  return behaviorStack
 }
 
-export const validateSpy = <TFunc extends AnyCallable>(
-  maybeSpy: unknown,
-): MockInstance<TFunc> => {
+export const validateMock = <TFunc extends AnyCallable>(
+  maybeMock: TFunc | Mock<TFunc>,
+): Mock<TFunc> => {
   if (
-    typeof maybeSpy === 'function' &&
-    'mockImplementation' in maybeSpy &&
-    typeof maybeSpy.mockImplementation === 'function' &&
-    'getMockImplementation' in maybeSpy &&
-    typeof maybeSpy.getMockImplementation === 'function' &&
-    'getMockName' in maybeSpy &&
-    typeof maybeSpy.getMockName === 'function'
+    typeof maybeMock === 'function' &&
+    'mockImplementation' in maybeMock &&
+    typeof maybeMock.mockImplementation === 'function'
   ) {
-    return maybeSpy as unknown as MockInstance<TFunc>
+    return maybeMock
   }
 
-  throw new NotAMockFunctionError(maybeSpy)
+  throw new NotAMockFunctionError(maybeMock)
 }
 
 export const getBehaviorStack = <TFunc extends AnyCallable>(
-  spy: MockInstance<TFunc>,
+  mock: Mock<TFunc>,
 ): BehaviorStack<TFunc> | undefined => {
-  const existingImplementation = spy.getMockImplementation() as
+  const existingImplementation = mock.getMockImplementation() as
     | WhenStubImplementation<TFunc>
     | TFunc
     | undefined

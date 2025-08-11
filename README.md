@@ -69,13 +69,13 @@ You should call `vi.resetAllMocks()` in your suite's `afterEach` hook to remove 
 
 [vitest's mock functions]: https://vitest.dev/api/mock.html
 [stubs]: https://en.wikipedia.org/wiki/Test_stub
-[when]: #whenspy-tfunc-stubwrappertfunc
-[called-with]: #calledwithargs-targs-stubtargs-treturn
-[then-return]: #thenreturnvalue-treturn
-[then-resolve]: #thenresolvevalue-treturn
-[then-throw]: #thenthrowerror-unknown
-[then-reject]: #thenrejecterror-unknown
-[then-do]: #thendocallback-args-targs--treturn
+[when]: #whenmock-tfunc-options-whenoptions-stubwrappertfunc
+[called-with]: #calledwithargs-parameterstfunc-stubtfunc
+[then-return]: #thenreturnvalue-treturn---mocktfunc
+[then-resolve]: #thenresolvevalue-treturn---mocktfunc
+[then-throw]: #thenthrowerror-unknown---mocktfunc
+[then-reject]: #thenrejecterror-unknown---mocktfunc
+[then-do]: #thendocallback-args-targs--treturn---mocktfunc
 
 ### Why not vanilla Vitest mocks?
 
@@ -184,7 +184,7 @@ export const calculateQuestion = async (answer: number): Promise<string> => {
 
 ## API
 
-### `when(spy: TFunc, options?: WhenOptions): StubWrapper<TFunc>`
+### `when(mock: TFunc, options?: WhenOptions): StubWrapper<TFunc>`
 
 Configures a `vi.fn()` or `vi.spyOn()` mock function to act as a vitest-when stub. Adds an implementation to the function that initially no-ops, and returns an API to configure behaviors for given arguments using [`.calledWith(...)`][called-with]
 
@@ -192,11 +192,11 @@ Configures a `vi.fn()` or `vi.spyOn()` mock function to act as a vitest-when stu
 import { vi } from 'vitest'
 import { when } from 'vitest-when'
 
-const spy = vi.fn()
+const mock = vi.fn()
 
-when(spy)
+when(mock)
 
-expect(spy()).toBe(undefined)
+expect(mock()).toBe(undefined)
 ```
 
 #### Options
@@ -209,36 +209,32 @@ import type { WhenOptions } from 'vitest-when'
 | ------- | ------- | ------- | -------------------------------------------------- |
 | `times` | N/A     | integer | Only trigger configured behavior a number of times |
 
-### `.calledWith(...args: TArgs): Stub<TArgs, TReturn>`
+### `.calledWith(...args: Parameters<TFunc>): Stub<TFunc>`
 
 Create a stub that matches a given set of arguments which you can configure with different behaviors using methods like [`.thenReturn(...)`][then-return].
 
 ```ts
-const spy = vi.fn()
+const mock = when(vi.fn()).calledWith('hello').thenReturn('world')
 
-when(spy).calledWith('hello').thenReturn('world')
-
-expect(spy('hello')).toEqual('world')
+expect(mock('hello')).toEqual('world')
 ```
 
 When a call to a mock uses arguments that match those given to `calledWith`, a configured behavior will be triggered. All arguments must match, but you can use Vitest's [asymmetric matchers][] to loosen the stubbing:
 
 ```ts
-const spy = vi.fn()
+const mock = when(vi.fn()).calledWith(expect.any(String)).thenReturn('world')
 
-when(spy).calledWith(expect.any(String)).thenReturn('world')
-
-expect(spy('hello')).toEqual('world')
-expect(spy('anything')).toEqual('world')
+expect(mock('hello')).toEqual('world')
+expect(mock('anything')).toEqual('world')
 ```
 
 If `calledWith` is used multiple times, the last configured stubbing will be used.
 
 ```ts
-when(spy).calledWith('hello').thenReturn('world')
-expect(spy('hello')).toEqual('world')
-when(spy).calledWith('hello').thenReturn('goodbye')
-expect(spy('hello')).toEqual('goodbye')
+when(mock).calledWith('hello').thenReturn('world')
+expect(mock('hello')).toEqual('world')
+when(mock).calledWith('hello').thenReturn('goodbye')
+expect(mock('hello')).toEqual('goodbye')
 ```
 
 [asymmetric matchers]: https://vitest.dev/api/expect.html#expect-anything
@@ -269,26 +265,24 @@ when<() => null>(overloaded).calledWith().thenReturn(null)
 By default, if arguments do not match, a vitest-when stub will no-op and return `undefined`. You can customize this fallback by configuring your own unconditional behavior on the mock using Vitest's built-in [mock API][].
 
 ```ts
-const spy = vi.fn().mockReturnValue('you messed up!')
+const mock = when(vi.fn(() => 'you messed up!')))
+  .calledWith('hello')
+  .thenReturn('world')
 
-when(spy).calledWith('hello').thenReturn('world')
-
-spy('hello') // "world"
-spy('jello') // "you messed up!"
+mock('hello') // "world"
+mock('jello') // "you messed up!"
 ```
 
 [mock API]: https://vitest.dev/api/mock.html
 
-### `.thenReturn(value: TReturn)`
+### `.thenReturn(value: TReturn) -> Mock<TFunc>`
 
 When the stubbing is satisfied, return `value`
 
 ```ts
-const spy = vi.fn()
+const mock = when(vi.fn()).calledWith('hello').thenReturn('world')
 
-when(spy).calledWith('hello').thenReturn('world')
-
-expect(spy('hello')).toEqual('world')
+expect(mock('hello')).toEqual('world')
 ```
 
 To only return a value once, use the `times` option.
@@ -296,36 +290,30 @@ To only return a value once, use the `times` option.
 ```ts
 import { when } from 'vitest-when'
 
-const spy = vi.fn()
+const mock = when(vi.fn(), { times: 1 }).calledWith('hello').thenReturn('world')
 
-when(spy, { times: 1 }).calledWith('hello').thenReturn('world')
-
-expect(spy('hello')).toEqual('world')
-expect(spy('hello')).toEqual(undefined)
+expect(mock('hello')).toEqual('world')
+expect(mock('hello')).toEqual(undefined)
 ```
 
 You may pass several values to `thenReturn` to return different values in succession. If you do not specify `times`, the last value will be latched. Otherwise, each value will be returned the specified number of times.
 
 ```ts
-const spy = vi.fn()
+const mock = when(vi.fn()).calledWith('hello').thenReturn('hi', 'sup?')
 
-when(spy).calledWith('hello').thenReturn('hi', 'sup?')
-
-expect(spy('hello')).toEqual('hi')
-expect(spy('hello')).toEqual('sup?')
-expect(spy('hello')).toEqual('sup?')
+expect(mock('hello')).toEqual('hi')
+expect(mock('hello')).toEqual('sup?')
+expect(mock('hello')).toEqual('sup?')
 ```
 
-### `.thenResolve(value: TReturn)`
+### `.thenResolve(value: TReturn) -> Mock<TFunc>`
 
 When the stubbing is satisfied, resolve a `Promise` with `value`
 
 ```ts
-const spy = vi.fn()
+const mock = when(vi.fn()).calledWith('hello').thenResolve('world')
 
-when(spy).calledWith('hello').thenResolve('world')
-
-expect(await spy('hello')).toEqual('world')
+await expect(mock('hello')).resolves.toEqual('world')
 ```
 
 To only resolve a value once, use the `times` option.
@@ -333,36 +321,32 @@ To only resolve a value once, use the `times` option.
 ```ts
 import { when } from 'vitest-when'
 
-const spy = vi.fn()
+const mock = when(vi.fn(), { times: 1 })
+  .calledWith('hello')
+  .thenResolve('world')
 
-when(spy, { times: 1 }).calledWith('hello').thenResolve('world')
-
-expect(await spy('hello')).toEqual('world')
-expect(spy('hello')).toEqual(undefined)
+await expect(mock('hello')).resolves.toEqual('world')
+expect(mock('hello')).toEqual(undefined)
 ```
 
 You may pass several values to `thenResolve` to resolve different values in succession. If you do not specify `times`, the last value will be latched. Otherwise, each value will be resolved the specified number of times.
 
 ```ts
-const spy = vi.fn()
+const mock = when(vi.fn()).calledWith('hello').thenResolve('hi', 'sup?')
 
-when(spy).calledWith('hello').thenResolve('hi', 'sup?')
-
-expect(await spy('hello')).toEqual('hi')
-expect(await spy('hello')).toEqual('sup?')
-expect(await spy('hello')).toEqual('sup?')
+await expect(mock('hello')).resolves.toEqual('hi')
+await expect(mock('hello')).resolves.toEqual('sup?')
+await expect(mock('hello')).resolves.toEqual('sup?')
 ```
 
-### `.thenThrow(error: unknown)`
+### `.thenThrow(error: unknown) -> Mock<TFunc>`
 
 When the stubbing is satisfied, throw `error`.
 
 ```ts
-const spy = vi.fn()
+const mock = when(vi.fn()).calledWith('hello').thenThrow(new Error('oh no'))
 
-when(spy).calledWith('hello').thenThrow(new Error('oh no'))
-
-expect(() => spy('hello')).toThrow('oh no')
+expect(() => mock('hello')).toThrow('oh no')
 ```
 
 To only throw an error only once, use the `times` option.
@@ -370,38 +354,34 @@ To only throw an error only once, use the `times` option.
 ```ts
 import { when } from 'vitest-when'
 
-const spy = vi.fn()
+const mock = when(vi.fn(), { times: 1 })
+  .calledWith('hello')
+  .thenThrow(new Error('oh no'))
 
-when(spy, { times: 1 }).calledWith('hello').thenThrow(new Error('oh no'))
-
-expect(() => spy('hello')).toThrow('oh no')
-expect(spy('hello')).toEqual(undefined)
+expect(() => mock('hello')).toThrow('oh no')
+expect(mock('hello')).toEqual(undefined)
 ```
 
 You may pass several values to `thenThrow` to throw different errors in succession. If you do not specify `times`, the last value will be latched. Otherwise, each error will be thrown the specified number of times.
 
 ```ts
-const spy = vi.fn()
-
-when(spy)
+const mock = when(vi.fn())
   .calledWith('hello')
   .thenThrow(new Error('oh no'), new Error('this is bad'))
 
-expect(() => spy('hello')).toThrow('oh no')
-expect(() => spy('hello')).toThrow('this is bad')
-expect(() => spy('hello')).toThrow('this is bad')
+expect(() => mock('hello')).toThrow('oh no')
+expect(() => mock('hello')).toThrow('this is bad')
+expect(() => mock('hello')).toThrow('this is bad')
 ```
 
-### `.thenReject(error: unknown)`
+### `.thenReject(error: unknown) -> Mock<TFunc>`
 
 When the stubbing is satisfied, reject a `Promise` with `error`.
 
 ```ts
-const spy = vi.fn()
+const mock = when(vi.fn()).calledWith('hello').thenReject(new Error('oh no'))
 
-when(spy).calledWith('hello').thenReject(new Error('oh no'))
-
-await expect(spy('hello')).rejects.toThrow('oh no')
+await expect(mock('hello')).rejects.toThrow('oh no')
 ```
 
 To only throw an error only once, use the `times` option.
@@ -409,44 +389,41 @@ To only throw an error only once, use the `times` option.
 ```ts
 import { times, when } from 'vitest-when'
 
-const spy = vi.fn()
+const mock = when(vi.fn(), { times: 1 })
+  .calledWith('hello')
+  .thenReject(new Error('oh no'))
 
-when(spy, { times: 1 }).calledWith('hello').thenReject(new Error('oh no'))
-
-await expect(spy('hello')).rejects.toThrow('oh no')
-expect(spy('hello')).toEqual(undefined)
+await expect(mock('hello')).rejects.toThrow('oh no')
+expect(mock('hello')).toEqual(undefined)
 ```
 
 You may pass several values to `thenReject` to throw different errors in succession. If you do not specify `times`, the last value will be latched. Otherwise, each rejection will be triggered the specified number of times.
 
 ```ts
-const spy = vi.fn()
-
-when(spy)
+const mock = when(vi.fn())
   .calledWith('hello')
   .thenReject(new Error('oh no'), new Error('this is bad'))
 
-await expect(spy('hello')).rejects.toThrow('oh no')
-await expect(spy('hello')).rejects.toThrow('this is bad')
-await expect(spy('hello')).rejects.toThrow('this is bad')
+await expect(mock('hello')).rejects.toThrow('oh no')
+await expect(mock('hello')).rejects.toThrow('this is bad')
+await expect(mock('hello')).rejects.toThrow('this is bad')
 ```
 
-### `.thenDo(callback: (...args: TArgs) => TReturn)`
+### `.thenDo(callback: (...args: TArgs) => TReturn) -> Mock<TFunc>`
 
 When the stubbing is satisfied, run `callback` to trigger a side-effect and return its result (if any). `thenDo` is a relatively powerful tool for stubbing complex behaviors, so if you find yourself using `thenDo` often, consider refactoring your code to use more simple interactions! Your future self will thank you.
 
 ```ts
-const spy = vi.fn()
 let called = false
 
-when(spy)
+const mock = when(vi.fn())
   .calledWith('hello')
   .thenDo(() => {
     called = true
     return 'world'
   })
 
-expect(spy('hello')).toEqual('world')
+expect(mock('hello')).toEqual('world')
 expect(called).toEqual(true)
 ```
 
@@ -455,33 +432,29 @@ To only run the callback once, use the `times` option.
 ```ts
 import { times, when } from 'vitest-when'
 
-const spy = vi.fn()
-
-when(spy, { times: 1 })
+const mock = when(vi.fn(), { times: 1 })
   .calledWith('hello')
   .thenDo(() => 'world')
 
-expect(spy('hello')).toEqual('world')
-expect(spy('hello')).toEqual(undefined)
+expect(mock('hello')).toEqual('world')
+expect(mock('hello')).toEqual(undefined)
 ```
 
 You may pass several callbacks to `thenDo` to trigger different side-effects in succession. If you do not specify `times`, the last callback will be latched. Otherwise, each callback will be triggered the specified number of times.
 
 ```ts
-const spy = vi.fn()
-
-when(spy)
+const mock = when(vi.fn())
   .calledWith('hello')
   .thenDo(
     () => 'world',
     () => 'solar system',
   )
 
-expect(spy('hello')).toEqual('world')
-expect(spy('hello')).toEqual('solar system')
+expect(mock('hello')).toEqual('world')
+expect(mock('hello')).toEqual('solar system')
 ```
 
-### `debug(spy: TFunc, options?: DebugOptions): DebugResult`
+### `debug(mock: TFunc, options?: DebugOptions): DebugResult`
 
 Logs and returns information about a mock's stubbing and usage. Useful if a test with mocks is failing and you can't figure out why.
 

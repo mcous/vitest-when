@@ -69,13 +69,13 @@ You should call `vi.resetAllMocks()` in your suite's `afterEach` hook to remove 
 
 [vitest's mock functions]: https://vitest.dev/api/mock.html
 [stubs]: https://en.wikipedia.org/wiki/Test_stub
-[when]: #whenspy-tfunc-stubwrappertfunc
-[called-with]: #calledwithargs-targs-stubtargs-treturn
-[then-return]: #thenreturnvalue-treturn
-[then-resolve]: #thenresolvevalue-treturn
-[then-throw]: #thenthrowerror-unknown
-[then-reject]: #thenrejecterror-unknown
-[then-do]: #thendocallback-args-targs--treturn
+[when]: #whenmock-tfunc-options-whenoptions-stubwrappertfunc
+[called-with]: #calledwithargs-parameterstfunc-stubtfunc
+[then-return]: #thenreturnvalue-treturn---mocktfunc
+[then-resolve]: #thenresolvevalue-treturn---mocktfunc
+[then-throw]: #thenthrowerror-unknown---mocktfunc
+[then-reject]: #thenrejecterror-unknown---mocktfunc
+[then-do]: #thendocallback-args-targs--treturn---mocktfunc
 
 ### Why not vanilla Vitest mocks?
 
@@ -374,7 +374,7 @@ expect(() => mock('hello')).toThrow('this is bad')
 expect(() => mock('hello')).toThrow('this is bad')
 ```
 
-### `.thenReject(error: unknown)`
+### `.thenReject(error: unknown) -> Mock<TFunc>`
 
 When the stubbing is satisfied, reject a `Promise` with `error`.
 

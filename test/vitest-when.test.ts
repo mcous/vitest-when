@@ -64,6 +64,17 @@ describe('vitest-when', () => {
     expect(spy()).toEqual(100)
   })
 
+  it('should fall back to original implementation after reset', () => {
+    const spy = vi.fn((n) => 2 * n)
+
+    vi.resetAllMocks()
+    expect(spy(2)).toEqual(4)
+
+    subject.when(spy).calledWith(1).thenReturn(4)
+    expect(spy(1)).toEqual(4)
+    expect(spy(2)).toEqual(4)
+  })
+
   it('should return a number of times', () => {
     const spy = vi.fn()
 

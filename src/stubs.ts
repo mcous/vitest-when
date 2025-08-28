@@ -4,6 +4,7 @@ import {
   createBehaviorStack,
 } from './behaviors.ts'
 import { NotAMockFunctionError } from './errors.ts'
+import { getFallbackImplementation } from './fallback-implementation.ts'
 import type {
   AnyCallable,
   AnyFunction,
@@ -29,7 +30,7 @@ export const configureStub = <TFunc extends AnyCallable>(
   }
 
   const behaviors = createBehaviorStack<TFunc>()
-  const fallbackImplementation = spy.getMockImplementation()
+  const fallbackImplementation = getFallbackImplementation(spy)
 
   const implementation = (...args: ExtractParameters<TFunc>) => {
     const behavior = behaviors.use(args)?.behavior ?? {

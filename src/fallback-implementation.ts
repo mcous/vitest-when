@@ -1,34 +1,45 @@
 import type { AnyCallable, MockInstance } from './types.ts'
 
-export function getFallbackImplementation<TFunc extends AnyCallable>(
-  spy: MockInstance<TFunc>,
-) {
-  // In vitest@<4, getMockImplementation() returns undefined after calling mockReset(), even
-  // if the mock was initialized with vi.fn(impl) and impl is still active.
-  // In this case, case the actual implementation from the wrapped tinyspy object.
-  return spy.getMockImplementation() ?? getTinyspyOriginalImplementation(spy)
+/** Get the fallback implementation of a mock if no matching stub is found. */
+export const getFallbackImplementation = <TFunc extends AnyCallable>(
+  mock: MockInstance<TFunc>,
+): TFunc | undefined => {
+  return (
+    mock.getMockImplementation() ?? getTinyspyInternals(mock)?.getOriginal()
+  )
 }
 
-function getTinyspyOriginalImplementation<TFunc extends AnyCallable>(
-  maybeTinyspy: MockInstance<TFunc>,
-): TFunc | undefined {
-  // tinyspy stores its internal state in a symbol property of the spy instance.
-  // This state "survives" vitest's mockReset and is the basis for returning the original
-  // function's behavior (the one it was instantiated with).
-  // Note that the state's impl field is not the original implementation after a reset, but getOriginal() is.
-  for (const sym of Object.getOwnPropertySymbols(maybeTinyspy)) {
-    const maybeTinyspyInternals = (
-      maybeTinyspy as unknown as { [sym]: unknown }
-    )[sym]
+/** Internal state from Tinyspy, where a mock's default implementation is stored. */
+interface TinyspyInternals<TFunc extends AnyCallable> {
+  getOriginal: () => TFunc | undefined
+}
+
+/**
+ * Get the fallback implementation out of tinyspy internals.
+ *
+ * This slight hack works around a bug in Vitest <= 3
+ * where `getMockImplementation` will return `undefined` after `mockReset`,
+ * even if a default implementation is still active.
+ * The implementation remains present in tinyspy internal state,
+ * which is stored on a Symbol key in the mock object.
+ */
+const getTinyspyInternals = <TFunc extends AnyCallable>(
+  mock: MockInstance<TFunc>,
+): TinyspyInternals<TFunc> | undefined => {
+  const maybeTinyspy = mock as unknown as Record<PropertyKey, unknown>
+
+  for (const key of Object.getOwnPropertySymbols(maybeTinyspy)) {
+    const maybeTinyspyInternals = maybeTinyspy[key]
+
     if (
       maybeTinyspyInternals &&
       typeof maybeTinyspyInternals === 'object' &&
       'getOriginal' in maybeTinyspyInternals &&
       typeof maybeTinyspyInternals.getOriginal === 'function'
     ) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      return maybeTinyspyInternals.getOriginal() as TFunc
+      return maybeTinyspyInternals as TinyspyInternals<TFunc>
     }
   }
+
   return undefined
 }

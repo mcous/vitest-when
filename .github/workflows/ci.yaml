@@ -71,6 +71,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     needs: [test, build]
+    environment: production
 
     permissions:
       contents: read
@@ -83,7 +84,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           registry-url: https://registry.npmjs.org
 
       - name: Download publish artifact
@@ -94,5 +95,3 @@ jobs:
 
       - name: Publish to npm
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

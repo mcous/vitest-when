@@ -5,7 +5,7 @@ import {
 
 import { type Behavior, BehaviorType } from './behaviors.ts'
 import { getBehaviorStack } from './stubs.ts'
-import type { AnyCallable, Mock } from './types.ts'
+import type { Mock } from './types.ts'
 
 export interface DebugResult {
   name: string
@@ -20,9 +20,7 @@ export interface Stubbing {
   calls: readonly unknown[][]
 }
 
-export const getDebug = <TFunc extends AnyCallable>(
-  mock: Mock<TFunc>,
-): DebugResult => {
+export const getDebug = (mock: Mock): DebugResult => {
   const name = mock.getMockName()
   const behaviors = getBehaviorStack(mock)
   const unmatchedCalls = behaviors?.getUnmatchedCalls() ?? mock.mock.calls

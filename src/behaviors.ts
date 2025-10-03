@@ -1,8 +1,8 @@
 import { equals } from '@vitest/expect'
 
 import type {
-  AnyCallable,
   AnyFunction,
+  Mock,
   ParametersOf,
   ReturnTypeOf,
   WithMatchers,
@@ -12,27 +12,25 @@ export interface WhenOptions {
   times?: number
 }
 
-export interface BehaviorStack<TFunc extends AnyCallable> {
-  use: (
-    args: ParametersOf<TFunc>,
-  ) => BehaviorEntry<ParametersOf<TFunc>> | undefined
+export interface BehaviorStack<TParameters extends unknown[], TReturn> {
+  use: (args: TParameters) => BehaviorEntry<TParameters> | undefined
 
-  getAll: () => readonly BehaviorEntry<ParametersOf<TFunc>>[]
+  getAll: () => readonly BehaviorEntry<TParameters>[]
 
-  getUnmatchedCalls: () => readonly ParametersOf<TFunc>[]
+  getUnmatchedCalls: () => readonly TParameters[]
 
   bindArgs: (
-    args: WithMatchers<ParametersOf<TFunc>>,
+    args: WithMatchers<TParameters>,
     options: WhenOptions,
-  ) => BoundBehaviorStack<ReturnTypeOf<TFunc>>
+  ) => BoundBehaviorStack<TParameters, TReturn>
 }
 
-export interface BoundBehaviorStack<TReturn> {
+export interface BoundBehaviorStack<TParameters extends unknown[], TReturn> {
   addReturn: (values: TReturn[]) => void
   addResolve: (values: Awaited<TReturn>[]) => void
   addThrow: (values: unknown[]) => void
   addReject: (values: unknown[]) => void
-  addDo: (values: AnyFunction[]) => void
+  addDo: (values: ((...args: TParameters) => TReturn)[]) => void
 }
 
 export interface BehaviorEntry<TArgs extends unknown[]> {
@@ -62,11 +60,16 @@ export interface BehaviorOptions<TValue> {
   maxCallCount: number | undefined
 }
 
+export type BehaviorStackOf<TMock extends Mock> = BehaviorStack<
+  ParametersOf<TMock>,
+  ReturnTypeOf<TMock>
+>
+
 export const createBehaviorStack = <
-  TFunc extends AnyCallable,
->(): BehaviorStack<TFunc> => {
-  const behaviors: BehaviorEntry<ParametersOf<TFunc>>[] = []
-  const unmatchedCalls: ParametersOf<TFunc>[] = []
+  TMock extends Mock,
+>(): BehaviorStackOf<TMock> => {
+  const behaviors: BehaviorEntry<ParametersOf<TMock>>[] = []
+  const unmatchedCalls: ParametersOf<TMock>[] = []
 
   return {
     getAll: () => behaviors,

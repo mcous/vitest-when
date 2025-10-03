@@ -69,10 +69,9 @@ describe('vitest-when type signatures', () => {
   })
 
   it('should handle an spied function', () => {
-    const target = { simple }
-    vi.spyOn(target, 'simple')
+    const target = vi.spyOn({ simple }, 'simple')
 
-    const result = subject.when(target.simple).calledWith(1).thenReturn('hello')
+    const result = subject.when(target).calledWith(1).thenReturn('hello')
 
     expectTypeOf(result.mock.calls).toEqualTypeOf<[number][]>()
     expectTypeOf(result).parameters.toEqualTypeOf<[number]>()

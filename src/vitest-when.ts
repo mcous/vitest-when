@@ -2,9 +2,9 @@ import type { WhenOptions } from './behaviors.ts'
 import { type DebugResult, getDebug } from './debug.ts'
 import { configureMock, validateMock } from './stubs.ts'
 import type {
-  AnyCallable,
   AsFunction,
   Mock,
+  MockSource,
   ParametersOf,
   ReturnTypeOf,
   WithMatchers,
@@ -14,24 +14,24 @@ export { type Behavior, BehaviorType, type WhenOptions } from './behaviors.ts'
 export type { DebugResult, Stubbing } from './debug.ts'
 export * from './errors.ts'
 
-export interface StubWrapper<TFunc extends AnyCallable> {
-  calledWith<TArgs extends ParametersOf<TFunc>>(
+export interface StubWrapper<TMock extends Mock> {
+  calledWith<TArgs extends ParametersOf<TMock>>(
     ...args: WithMatchers<TArgs>
-  ): Stub<TFunc>
+  ): Stub<TMock>
 }
 
-export interface Stub<TFunc extends AnyCallable> {
-  thenReturn: (...values: ReturnTypeOf<TFunc>[]) => Mock<TFunc>
-  thenResolve: (...values: Awaited<ReturnTypeOf<TFunc>>[]) => Mock<TFunc>
-  thenThrow: (...errors: unknown[]) => Mock<TFunc>
-  thenReject: (...errors: unknown[]) => Mock<TFunc>
-  thenDo: (...callbacks: AsFunction<TFunc>[]) => Mock<TFunc>
+export interface Stub<TMock extends Mock> {
+  thenReturn: (...values: ReturnTypeOf<TMock>[]) => TMock
+  thenResolve: (...values: Awaited<ReturnTypeOf<TMock>>[]) => TMock
+  thenThrow: (...errors: unknown[]) => TMock
+  thenReject: (...errors: unknown[]) => TMock
+  thenDo: (...callbacks: AsFunction<TMock>[]) => TMock
 }
 
-export const when = <TFunc extends AnyCallable>(
-  mock: TFunc | Mock<TFunc>,
+export const when = <TMockSource extends MockSource>(
+  mock: TMockSource,
   options: WhenOptions = {},
-): StubWrapper<TFunc> => {
+): StubWrapper<Mock<TMockSource>> => {
   const validatedMock = validateMock(mock)
   const behaviorStack = configureMock(validatedMock)
 
@@ -69,8 +69,8 @@ export interface DebugOptions {
   log?: boolean
 }
 
-export const debug = <TFunc extends AnyCallable>(
-  mock: TFunc | Mock<TFunc>,
+export const debug = (
+  mock: MockSource,
   options: DebugOptions = {},
 ): DebugResult => {
   const log = options.log ?? true

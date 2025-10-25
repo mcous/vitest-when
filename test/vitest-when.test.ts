@@ -129,6 +129,19 @@ describe('vitest-when', () => {
     expect(callback).toHaveBeenCalledTimes(1)
   })
 
+  it('should pass this to the callback', () => {
+    const ok = Symbol('ok')
+    const Spy = subject
+      .when(vi.fn())
+      .calledWith()
+      .thenDo(function (this: unknown) {
+        expect(this).toBeInstanceOf(Spy)
+        return { ok }
+      })
+
+    expect(new Spy()).toEqual({ ok })
+  })
+
   it('should return multiple values', () => {
     const spy = subject.when(vi.fn()).calledWith(1, 2, 3).thenReturn(4, 5, 6)
 

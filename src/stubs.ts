@@ -33,7 +33,7 @@ export const configureMock = <TMock extends Mock>(
   const behaviorStack = createBehaviorStack<TMock>()
   const fallbackImplementation = getFallbackImplementation(mock)
 
-  function implementation(...args: ParametersOf<TMock>) {
+  function implementation(this: ThisType<TMock>, ...args: ParametersOf<TMock>) {
     const behavior = behaviorStack.use(args)?.behavior ?? {
       type: BehaviorType.DO,
       callback: fallbackImplementation,

@@ -49,7 +49,7 @@
     "@mcous/prettier-config": "^0.4.0",
     "@mcous/typescript-config": "^0.3.0",
     "@types/node": "^24.9.1",
-    "@vitest/coverage-istanbul": "^4.0.3",
+    "@vitest/coverage-v8": "^4.0.3",
     "@vitest/expect": "^4.0.3",
     "concurrently": "^9.2.1",
     "eslint": "^9.38.0",

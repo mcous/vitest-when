@@ -8,8 +8,8 @@ export default defineConfig({
   },
   test: {
     coverage: {
-      provider: 'istanbul',
-      exclude: ['example', 'test'],
+      provider: 'v8',
+      include: ['src/**/*'],
       reporter: ['text', 'html', 'lcovonly'],
     },
   },

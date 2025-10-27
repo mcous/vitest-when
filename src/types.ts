@@ -3,8 +3,6 @@
 import type { AsymmetricMatcher } from '@vitest/expect'
 import type { MockedClass, MockedFunction } from 'vitest'
 
-export const BEHAVIORS_KEY = Symbol.for('vitest-when:behaviors')
-
 /** Any function. */
 export type AnyFunction = (...args: any[]) => any
 

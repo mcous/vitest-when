@@ -2,7 +2,8 @@ import { equals } from '@vitest/expect'
 
 import type {
   AnyFunction,
-  Mock,
+  AnyMockable,
+  AsFunction,
   ParametersOf,
   ReturnTypeOf,
   WithMatchers,
@@ -12,25 +13,27 @@ export interface WhenOptions {
   times?: number
 }
 
-export interface BehaviorStack<TParameters extends unknown[], TReturn> {
-  use: (args: TParameters) => BehaviorEntry<TParameters> | undefined
+export interface BehaviorStack<TFunc extends AnyMockable> {
+  use: (
+    args: ParametersOf<TFunc>,
+  ) => BehaviorEntry<ParametersOf<TFunc>> | undefined
 
-  getAll: () => readonly BehaviorEntry<TParameters>[]
+  getAll: () => readonly BehaviorEntry<ParametersOf<TFunc>>[]
 
-  getUnmatchedCalls: () => readonly TParameters[]
+  getUnmatchedCalls: () => readonly ParametersOf<TFunc>[]
 
   bindArgs: (
-    args: WithMatchers<TParameters>,
+    args: WithMatchers<ParametersOf<TFunc>>,
     options: WhenOptions,
-  ) => BoundBehaviorStack<TParameters, TReturn>
+  ) => BoundBehaviorStack<TFunc>
 }
 
-export interface BoundBehaviorStack<TParameters extends unknown[], TReturn> {
-  addReturn: (values: TReturn[]) => void
-  addResolve: (values: Awaited<TReturn>[]) => void
+export interface BoundBehaviorStack<TFunc extends AnyMockable> {
+  addReturn: (values: ReturnTypeOf<TFunc>[]) => void
+  addResolve: (values: Awaited<ReturnTypeOf<TFunc>>[]) => void
   addThrow: (values: unknown[]) => void
   addReject: (values: unknown[]) => void
-  addDo: (values: ((...args: TParameters) => TReturn)[]) => void
+  addDo: (values: AsFunction<TFunc>[]) => void
 }
 
 export interface BehaviorEntry<TArgs extends unknown[]> {
@@ -60,16 +63,11 @@ export interface BehaviorOptions<TValue> {
   maxCallCount: number | undefined
 }
 
-export type BehaviorStackOf<TMock extends Mock> = BehaviorStack<
-  ParametersOf<TMock>,
-  ReturnTypeOf<TMock>
->
-
 export const createBehaviorStack = <
-  TMock extends Mock,
->(): BehaviorStackOf<TMock> => {
-  const behaviors: BehaviorEntry<ParametersOf<TMock>>[] = []
-  const unmatchedCalls: ParametersOf<TMock>[] = []
+  TFunc extends AnyMockable,
+>(): BehaviorStack<TFunc> => {
+  const behaviors: BehaviorEntry<ParametersOf<TFunc>>[] = []
+  const unmatchedCalls: ParametersOf<TFunc>[] = []
 
   return {
     getAll: () => behaviors,
@@ -145,7 +143,10 @@ export const createBehaviorStack = <
             ({ value, maxCallCount }) => ({
               args,
               maxCallCount,
-              behavior: { type: BehaviorType.DO, callback: value },
+              behavior: {
+                type: BehaviorType.DO,
+                callback: value as AnyFunction,
+              },
               calls: [],
             }),
           ),

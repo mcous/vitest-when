@@ -42,21 +42,21 @@
   },
   "prettier": "@mcous/prettier-config",
   "dependencies": {
-    "pretty-format": "^30.0.2"
+    "pretty-format": "^30.2.0"
   },
   "devDependencies": {
-    "@mcous/eslint-config": "^0.6.0",
+    "@mcous/eslint-config": "^0.7.0",
     "@mcous/prettier-config": "^0.4.0",
     "@mcous/typescript-config": "^0.3.0",
-    "@types/node": "^24.0.14",
-    "@vitest/coverage-istanbul": "^3.2.4",
-    "@vitest/expect": "^3.2.4",
-    "concurrently": "^9.2.0",
-    "eslint": "^9.31.0",
+    "@types/node": "^24.9.1",
+    "@vitest/coverage-istanbul": "^4.0.3",
+    "@vitest/expect": "^4.0.3",
+    "concurrently": "^9.2.1",
+    "eslint": "^9.38.0",
     "prettier": "^3.6.2",
     "tsup": "^8.5.0",
-    "typescript": "5.8.3",
-    "vitest": "^3.2.4"
+    "typescript": "5.9.3",
+    "vitest": "^4.0.3"
   },
   "peerDependencies": {
     "@vitest/expect": ">=0.31.0 <5",
@@ -67,7 +67,7 @@
       "optional": true
     }
   },
-  "packageManager": "pnpm@10.4.1+sha256.4b702887986995933d4300836b04d6d02a43bc72b52e4f7e93a4ca608b959197",
+  "packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8",
   "publishConfig": {
     "access": "public",
     "provenance": true

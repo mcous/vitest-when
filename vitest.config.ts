@@ -9,7 +9,7 @@ export default defineConfig({
   test: {
     coverage: {
       provider: 'istanbul',
-      exclude: ['example', 'test'],
+      include: ['src/**/*'],
       reporter: ['text', 'html', 'lcovonly'],
     },
   },

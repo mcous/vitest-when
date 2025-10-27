@@ -1,18 +1,18 @@
-import type { AsFunction, Mock } from './types.ts'
+import type { AnyFunction, MockInstance } from './types.ts'
 
 /** Get the fallback implementation of a mock if no matching stub is found. */
-export const getFallbackImplementation = <TMock extends Mock>(
-  mock: TMock,
-): AsFunction<TMock> | undefined => {
+export const getFallbackImplementation = (
+  mock: MockInstance,
+): AnyFunction | undefined => {
   return (
-    (mock.getMockImplementation() as AsFunction<TMock> | undefined) ??
+    (mock.getMockImplementation() as AnyFunction | undefined) ??
     getTinyspyInternals(mock)?.getOriginal()
   )
 }
 
 /** Internal state from Tinyspy, where a mock's default implementation is stored. */
-interface TinyspyInternals<TMock extends Mock> {
-  getOriginal: () => AsFunction<TMock> | undefined
+interface TinyspyInternals {
+  getOriginal: () => AnyFunction | undefined
 }
 
 /**
@@ -24,9 +24,9 @@ interface TinyspyInternals<TMock extends Mock> {
  * The implementation remains present in tinyspy internal state,
  * which is stored on a Symbol key in the mock object.
  */
-const getTinyspyInternals = <TMock extends Mock>(
-  mock: TMock,
-): TinyspyInternals<TMock> | undefined => {
+const getTinyspyInternals = (
+  mock: MockInstance,
+): TinyspyInternals | undefined => {
   const maybeTinyspy = mock as unknown as Record<PropertyKey, unknown>
 
   for (const key of Object.getOwnPropertySymbols(maybeTinyspy)) {
@@ -38,7 +38,7 @@ const getTinyspyInternals = <TMock extends Mock>(
       'getOriginal' in maybeTinyspyInternals &&
       typeof maybeTinyspyInternals.getOriginal === 'function'
     ) {
-      return maybeTinyspyInternals as TinyspyInternals<TMock>
+      return maybeTinyspyInternals as TinyspyInternals
     }
   }
 

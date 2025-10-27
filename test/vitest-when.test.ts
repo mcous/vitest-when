@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import * as subject from '../src/vitest-when.ts'
+import { SimpleClass } from './fixtures.ts'
 
 declare module 'vitest' {
   interface AsymmetricMatchersContaining {
@@ -127,6 +128,26 @@ describe('vitest-when', () => {
     expect(spy(1, 2, 3)).toEqual(4)
     expect(callback).toHaveBeenCalledWith(1, 2, 3)
     expect(callback).toHaveBeenCalledTimes(1)
+  })
+
+  it('should mock a constructor via thenDo', () => {
+    const Spy = subject
+      .when(vi.fn<typeof SimpleClass>())
+      .calledWith(42)
+      .thenDo(function (this: SimpleClass) {
+        this.simpleMethod = () => 'hello'
+      })
+
+    expect(new Spy(42).simpleMethod()).toBe('hello')
+  })
+
+  it('should mock a constructor via thenReturn', () => {
+    const Spy = subject
+      .when(vi.fn<typeof SimpleClass>())
+      .calledWith(42)
+      .thenReturn({ simpleMethod: () => 'hello' })
+
+    expect(new Spy(42).simpleMethod()).toBe('hello')
   })
 
   it('should return multiple values', () => {

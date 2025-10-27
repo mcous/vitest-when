@@ -33,7 +33,7 @@ export const configureMock = <TFunc extends AnyMockable>(
   const behaviorStack = createBehaviorStack<TFunc>()
   const fallbackImplementation = getFallbackImplementation(mock)
 
-  const implementation = (...args: ParametersOf<TFunc>) => {
+  function implementation(this: ThisType<TFunc>, ...args: ParametersOf<TFunc>) {
     const behavior = behaviorStack.use(args)?.behavior ?? {
       type: BehaviorType.DO,
       callback: fallbackImplementation,
@@ -59,7 +59,7 @@ export const configureMock = <TFunc extends AnyMockable>(
 
       case BehaviorType.DO: {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return behavior.callback?.(...args)
+        return behavior.callback?.call(this, ...args)
       }
     }
   }

@@ -2,3 +2,4 @@ coverage
 dist
 node_modules
 tsconfig.vitest-temp.json
+*.tgz

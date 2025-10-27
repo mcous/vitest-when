@@ -11,7 +11,7 @@ describe('vitest-when debug', () => {
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
     expect(result).toEqual({
-      name: 'spy',
+      name: 'vi.fn()',
       stubbings: [],
       unmatchedCalls: [],
       description: expect.stringContaining(
@@ -28,7 +28,7 @@ describe('vitest-when debug', () => {
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
     expect(result).toEqual({
-      name: 'spy',
+      name: 'vi.fn()',
       stubbings: [
         {
           args: ['hello', 'world'],
@@ -52,7 +52,7 @@ describe('vitest-when debug', () => {
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
     expect(result).toMatchObject({
-      name: 'spy',
+      name: 'vi.fn()',
       stubbings: [
         {
           args: [expect.any(String)],
@@ -75,7 +75,7 @@ describe('vitest-when debug', () => {
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
     expect(result).toMatchObject({
-      name: 'spy',
+      name: 'vi.fn()',
       stubbings: [
         {
           args: [expect.any(String)],

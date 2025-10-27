@@ -1,10 +1,12 @@
 import type { WhenOptions } from './behaviors.ts'
 import { type DebugResult, getDebug } from './debug.ts'
-import { configureMock, validateMock } from './stubs.ts'
+import { asMock, configureMock, validateMock } from './stubs.ts'
 import type {
+  AnyMockable,
   AsFunction,
   Mock,
-  MockSource,
+  MockInstance,
+  NormalizeMockable,
   ParametersOf,
   ReturnTypeOf,
   WithMatchers,
@@ -14,26 +16,27 @@ export { type Behavior, BehaviorType, type WhenOptions } from './behaviors.ts'
 export type { DebugResult, Stubbing } from './debug.ts'
 export * from './errors.ts'
 
-export interface StubWrapper<TMock extends Mock> {
-  calledWith<TArgs extends ParametersOf<TMock>>(
+export interface StubWrapper<TFunc extends AnyMockable> {
+  calledWith<TArgs extends ParametersOf<TFunc>>(
     ...args: WithMatchers<TArgs>
-  ): Stub<TMock>
+  ): Stub<TFunc>
 }
 
-export interface Stub<TMock extends Mock> {
-  thenReturn: (...values: ReturnTypeOf<TMock>[]) => TMock
-  thenResolve: (...values: Awaited<ReturnTypeOf<TMock>>[]) => TMock
-  thenThrow: (...errors: unknown[]) => TMock
-  thenReject: (...errors: unknown[]) => TMock
-  thenDo: (...callbacks: AsFunction<TMock>[]) => TMock
+export interface Stub<TFunc extends AnyMockable> {
+  thenReturn: (...values: ReturnTypeOf<TFunc>[]) => Mock<TFunc>
+  thenResolve: (...values: Awaited<ReturnTypeOf<TFunc>>[]) => Mock<TFunc>
+  thenThrow: (...errors: unknown[]) => Mock<TFunc>
+  thenReject: (...errors: unknown[]) => Mock<TFunc>
+  thenDo: (...callbacks: AsFunction<TFunc>[]) => Mock<TFunc>
 }
 
-export const when = <TMockSource extends MockSource>(
-  mock: TMockSource,
+export const when = <TFunc extends AnyMockable>(
+  mock: TFunc | MockInstance<TFunc>,
   options: WhenOptions = {},
-): StubWrapper<Mock<TMockSource>> => {
+): StubWrapper<NormalizeMockable<TFunc>> => {
   const validatedMock = validateMock(mock)
   const behaviorStack = configureMock(validatedMock)
+  const result = asMock(validatedMock)
 
   return {
     calledWith: (...args) => {
@@ -42,23 +45,23 @@ export const when = <TMockSource extends MockSource>(
       return {
         thenReturn: (...values) => {
           behaviors.addReturn(values)
-          return validatedMock
+          return result
         },
         thenResolve: (...values) => {
           behaviors.addResolve(values)
-          return validatedMock
+          return result
         },
         thenThrow: (...errors) => {
           behaviors.addThrow(errors)
-          return validatedMock
+          return result
         },
         thenReject: (...errors) => {
           behaviors.addReject(errors)
-          return validatedMock
+          return result
         },
         thenDo: (...callbacks) => {
           behaviors.addDo(callbacks)
-          return validatedMock
+          return result
         },
       }
     },
@@ -70,7 +73,7 @@ export interface DebugOptions {
 }
 
 export const debug = (
-  mock: MockSource,
+  mock: AnyMockable | MockInstance,
   options: DebugOptions = {},
 ): DebugResult => {
   const log = options.log ?? true

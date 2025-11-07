@@ -37,6 +37,7 @@ Wrap your `vi.fn()` mock - or a function imported from a `vi.mock`'d module - in
 - [`.thenThrow()`][then-throw] - Throw an error
 - [`.thenReject()`][then-reject] - Reject a `Promise`
 - [`.thenDo()`][then-do] - Trigger a function
+- [`.thenCallback()`][then-callback] - Invoke a callback argument
 
 If the stub is called with arguments that match `calledWith`, the configured behavior will occur. If the arguments do not match, the stub will no-op and return `undefined`.
 
@@ -76,6 +77,7 @@ You should call `vi.resetAllMocks()` in your suite's `afterEach` hook to remove 
 [then-throw]: #thenthrowerror-unknown---mocktfunc
 [then-reject]: #thenrejecterror-unknown---mocktfunc
 [then-do]: #thendocallback-args-targs--treturn---mocktfunc
+[then-callback]: #thencallbackargs-unknown---mocktfunc
 
 ### Why not vanilla Vitest mocks?
 
@@ -205,9 +207,10 @@ expect(mock()).toBe(undefined)
 import type { WhenOptions } from 'vitest-when'
 ```
 
-| option  | default | type    | description                                        |
-| ------- | ------- | ------- | -------------------------------------------------- |
-| `times` | N/A     | integer | Only trigger configured behavior a number of times |
+| option            | default | type    | description                                        |
+| ----------------- | ------- | ------- | -------------------------------------------------- |
+| `times`           | N/A     | integer | Only trigger configured behavior a number of times |
+| `ignoreExtraArgs` | `false` | boolean | Match calls even when extra arguments are provided |
 
 ### `.calledWith(...args: Parameters<TFunc>): Stub<TFunc>`
 
@@ -452,6 +455,92 @@ const mock = when(vi.fn())
 
 expect(mock('hello')).toEqual('world')
 expect(mock('hello')).toEqual('solar system')
+```
+
+### `.thenCallback(...args: unknown[]) -> Mock<TFunc>`
+
+When the stubbing is satisfied, invoke a callback function passed as an argument with the specified `args`. Use with [`expect.callback()`][expect-callback] to match callback arguments.
+
+```ts
+const mock = when(vi.fn())
+  .calledWith('data', expect.callback())
+  .thenCallback('result')
+
+mock('data', (value) => {
+  console.log(value) // 'result'
+})
+```
+
+If you don't specify `expect.callback()` in `calledWith`, an implied callback matcher is added as the last argument:
+
+```ts
+const mock = when(vi.fn()).calledWith('data').thenCallback('result')
+
+mock('data', (value) => {
+  console.log(value) // 'result'
+})
+```
+
+Callbacks are invoked asynchronously on the next tick. Use [`nextTick()`][next-tick] to wait for callback execution:
+
+```ts
+import { when, nextTick } from 'vitest-when'
+
+const callback = vi.fn()
+const mock = when(vi.fn()).calledWith('hello').thenCallback('world')
+
+mock('hello', callback)
+
+await nextTick()
+expect(callback).toHaveBeenCalledWith('world')
+```
+
+You can specify callback arguments directly in `expect.callback()` instead of `thenCallback()`:
+
+```ts
+const mock = when(vi.fn())
+  .calledWith(expect.callback('first'), expect.callback('second'))
+  .thenReturn('done')
+
+const cb1 = vi.fn()
+const cb2 = vi.fn()
+
+mock(cb1, cb2)
+
+await nextTick()
+expect(cb1).toHaveBeenCalledWith('first')
+expect(cb2).toHaveBeenCalledWith('second')
+```
+
+[expect-callback]: #expectcallbackargs-unknown
+[next-tick]: #nexttick
+
+### `expectCallback(...args: unknown[])`
+
+This is the same as `expect.callback()`, but exported as `expectCallback` for use when the your tests use the context's `expect` function (e.g. `it('test', ({ expect }) => { ... }))`).
+
+```ts
+import { when, expectCallback } from 'vitest-when'
+
+when(mock).calledWith(expectCallback('arg')).thenReturn('result')
+// or
+when(mock).calledWith(expect.callback('arg')).thenReturn('result')
+```
+
+### `nextTick()`
+
+Returns a `Promise` that resolves on the next tick. Required when testing callbacks with `thenCallback()` since callbacks are invoked asynchronously.
+
+```ts
+import { when, nextTick } from 'vitest-when'
+
+const callback = vi.fn()
+when(mock).calledWith('test').thenCallback('value')
+
+mock('test', callback)
+
+await nextTick()
+expect(callback).toHaveBeenCalledWith('value')
 ```
 
 ### `debug(mock: TFunc, options?: DebugOptions): DebugResult`

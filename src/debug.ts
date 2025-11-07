@@ -1,3 +1,4 @@
+import { equals } from '@vitest/expect'
 import {
   format as prettyFormat,
   plugins as prettyFormatPlugins,
@@ -20,9 +21,10 @@ export interface DebugResult {
 }
 
 export interface Stubbing {
-  args: readonly unknown[]
-  behavior: Behavior
-  calls: readonly unknown[][]
+  args: unknown[]
+  plan: StubbingPlan
+  values: unknown[]
+  calls: unknown[][]
 }
 
 export const getDebug = (mock: MockInstance): DebugResult => {
@@ -30,73 +32,123 @@ export const getDebug = (mock: MockInstance): DebugResult => {
   const behaviors = getBehaviorStack(mock)
   const unmatchedCalls = behaviors?.getUnmatchedCalls() ?? mock.mock.calls
   const stubbings =
-    behaviors?.getAll().map((entry) => ({
-      args: entry.args,
-      behavior: { type: entry.options.plan, values: entry.values },
-      calls: entry.calls,
-    })) ?? []
+    behaviors?.getAll().map(
+      (entry): Stubbing => ({
+        args: entry.args,
+        plan: entry.options.plan,
+        values: entry.values,
+        calls: entry.calls,
+      }),
+    ) ?? []
 
   const result = { name, stubbings, unmatchedCalls }
-  const description = formatDebug(result)
+  const description = formatDebug(result, mock.mock.calls)
 
   return { ...result, description }
 }
 
-const formatDebug = (debug: Omit<DebugResult, 'description'>): string => {
+const formatDebug = (
+  debug: Omit<DebugResult, 'description'>,
+  allCalls: unknown[][],
+): string => {
   const { name, stubbings, unmatchedCalls } = debug
   const callCount = stubbings.reduce(
     (result, { calls }) => result + calls.length,
     0,
   )
   const stubbingCount = stubbings.length
-  const unmatchedCallsCount = unmatchedCalls.length
+  const unmatchedCallCount = unmatchedCalls.length
 
-  return [
-    `\`${name}()\` has:`,
-    `* ${count(stubbingCount, 'stubbing')} with ${count(callCount, 'call')}`,
-    ...stubbings.map((stubbing) => `  * ${formatStubbing(stubbing)}`).reverse(),
-    `* ${count(unmatchedCallsCount, 'unmatched call')}`,
-    ...unmatchedCalls.map((args) => `  * \`${formatCall(args)}\``),
-    '',
-  ].join('\n')
+  return (
+    mockDescription(name, stubbingCount, callCount + unmatchedCallCount) +
+    stubbingDescription(stubbings) +
+    callDescription(
+      allCalls,
+      stubbings.flatMap((stub) => stub.calls),
+    )
+  )
 }
 
-const formatStubbing = ({ args, behavior, calls }: Stubbing): string => {
-  return `Called ${count(calls.length, 'time')}: \`${formatCall(
-    args,
-  )} ${formatBehavior(behavior)}\``
+const mockDescription = (
+  name: string,
+  stubbingCount: number,
+  callCount: number,
+) =>
+  `\`${name}\` has ${count(stubbingCount, 'stubbing')} with ${count(callCount, 'call')}.`
+
+const stubbingDescription = (stubs: readonly Stubbing[]) => {
+  if (stubs.length === 0) return ''
+
+  return (
+    `\n\nStubbings:\n` +
+    stubs
+      .map(
+        (stub) =>
+          `  - ${formatCall(stub.args)}, then ${planFor(stub.plan)} ${formatValues(stub.values)}`,
+      )
+      .join('\n')
+  )
+}
+
+const callDescription = (
+  allCalls: unknown[][],
+  satisfiedCalls: unknown[][],
+) => {
+  if (allCalls.length === 0) return ''
+
+  const callWasSatisfied = (call: unknown[]) =>
+    satisfiedCalls.some((satisfiedCall) => equals(satisfiedCall, call))
+
+  return (
+    `\n\n${count(allCalls.length, 'call')}:\n` +
+    allCalls
+      .map((call) => {
+        return `  ${callWasSatisfied(call) ? '✔' : '-'} ${formatCall(call)}`
+      })
+      .join('\n')
+  )
 }
 
 const formatCall = (args: readonly unknown[]): string => {
   return `(${args.map((a) => stringify(a)).join(', ')})`
 }
 
-const formatBehavior = (behavior: Behavior): string => {
-  switch (behavior.type) {
+const formatValues = (values: readonly unknown[]): string => {
+  return stringifyValues(values, ', then ', '`')
+}
+
+const planFor = (plan: StubbingPlan): string => {
+  switch (plan) {
     case 'thenReturn': {
-      return `=> ${stringify(behavior.values[0])}`
+      return 'return'
     }
-
     case 'thenResolve': {
-      return `=> Promise.resolve(${stringify(behavior.values[0])})`
+      return 'resolve'
     }
-
     case 'thenThrow': {
-      return `=> { throw ${stringify(behavior.values[0])} }`
+      return 'throw'
     }
-
     case 'thenReject': {
-      return `=> Promise.reject(${stringify(behavior.values[0])})`
+      return 'reject'
     }
-
-    case 'thenDo': {
-      return `=> ${stringify(behavior.values[0])}()`
+    default: {
+      return 'return'
     }
   }
 }
 
 const count = (amount: number, thing: string) =>
   `${amount} ${thing}${amount === 1 ? '' : 's'}`
+
+const stringifyValues = (
+  values: readonly unknown[],
+  joiner = ', ',
+  wrapper = '',
+) => {
+  return values
+    .map((value) => `${wrapper}${stringify(value)}${wrapper}`)
+    .join(joiner)
+}
 
 const {
   AsymmetricMatcher,

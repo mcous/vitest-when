@@ -32,13 +32,14 @@ describe('vitest-when debug', () => {
       stubbings: [
         {
           args: ['hello', 'world'],
-          behavior: { type: 'thenReturn', values: [42] },
+          plan: 'thenReturn',
+          values: [42],
           calls: [],
         },
       ],
       unmatchedCalls: [],
       description: expect.stringContaining('1 stubbing with 0 calls') as string,
-    })
+    } satisfies subject.DebugResult)
   })
 
   it('debugs called stubbings', () => {
@@ -51,18 +52,22 @@ describe('vitest-when debug', () => {
 
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       name: 'vi.fn()',
       stubbings: [
         {
           args: [expect.any(String)],
-          behavior: { type: 'thenReturn', values: [42] },
+          plan: 'thenReturn',
+          values: [42],
           calls: [['hello'], ['world']],
         },
       ],
       unmatchedCalls: [],
-      description: expect.stringContaining('1 stubbing with 2 calls') as string,
-    })
+      // Checkmark ✔ calls fulfilled by any stubbing
+      description: expect.stringMatching(
+        /2 calls:\n\s+✔ \("hello"\)\n\s+✔ \("world"\)/u,
+      ) as string,
+    } satisfies subject.DebugResult)
   })
 
   it('debugs unmatched calls', () => {
@@ -74,18 +79,21 @@ describe('vitest-when debug', () => {
 
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       name: 'vi.fn()',
       stubbings: [
         {
           args: [expect.any(String)],
-          behavior: { type: 'thenReturn', values: [42] },
+          plan: 'thenReturn',
+          values: [42],
           calls: [],
         },
       ],
       unmatchedCalls: [[1234]],
-      description: expect.stringContaining('1 unmatched call') as string,
-    })
+      description: expect.stringMatching(
+        /1 call:\n\s+- \(1234\)/,
+      ) as string,
+    } satisfies subject.DebugResult)
   })
 
   it('describes thenReturn stubbings', () => {
@@ -95,7 +103,19 @@ describe('vitest-when debug', () => {
 
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
-    expect(result.description).toMatch('("hello", "world") => 42')
+    expect(result.description).toMatch('("hello", "world"), then return `42`')
+  })
+
+  it('describes multiple values', () => {
+    const spy = vi.fn().mockName('spy')
+
+    subject.when(spy).calledWith('hello', 'world').thenReturn(42, 1337)
+
+    const result = subject.debug(spy, DEBUG_OPTIONS)
+
+    expect(result.description).toMatch(
+      `("hello", "world"), then return \`42\`, then \`1337\``,
+    )
   })
 
   it('describes thenResolve stubbings', () => {
@@ -105,9 +125,7 @@ describe('vitest-when debug', () => {
 
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
-    expect(result.description).toMatch(
-      '("hello", "world") => Promise.resolve(42)',
-    )
+    expect(result.description).toMatch('("hello", "world"), then resolve `42`')
   })
 
   it('describes thenThrow stubbings', () => {
@@ -118,7 +136,7 @@ describe('vitest-when debug', () => {
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
     expect(result.description).toMatch(
-      '("hello", "world") => { throw [Error: oh no] }',
+      '("hello", "world"), then throw `[Error: oh no]`',
     )
   })
 
@@ -133,7 +151,7 @@ describe('vitest-when debug', () => {
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
     expect(result.description).toMatch(
-      '("hello", "world") => Promise.reject([Error: oh no])',
+      '("hello", "world"), then reject `[Error: oh no]`',
     )
   })
 
@@ -148,7 +166,7 @@ describe('vitest-when debug', () => {
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
     expect(result.description).toMatch(
-      '("hello", "world") => [Function anonymous]()',
+      '("hello", "world"), then return `[Function anonymous]`',
     )
   })
 
@@ -164,19 +182,20 @@ describe('vitest-when debug', () => {
 
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
-    expect(result.description).toMatch('({"toJSON": [Function toJSON]})')
+    expect(result.description).toMatch(
+      /1 call:\n\s+- \(\{"toJSON": \[Function toJSON\]\}\)/,
+    )
   })
 
   it('describes calls with long values', () => {
     const spy = vi.fn()
-    const longString = Array.from({ length: 1001 }).join('x')
-    const value = Array.from({ length: 100 })
-    value.fill(longString)
+    const longString = 'x'.repeat(1000)
+    const value = Array.from({ length: 10 }, () => longString)
 
     spy(value)
 
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
-    expect(result.description).toMatch(/\(\["x.+, …\]\)/u)
+    expect(result.description).toMatch(/1 call:\n\s+- \(\["x.+, …\]\)/u)
   })
 })

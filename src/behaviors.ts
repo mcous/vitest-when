@@ -1,6 +1,12 @@
 import { equals } from '@vitest/expect'
 
-import type { AnyMockable, ParametersOf, WithMatchers } from './types.ts'
+import { concatImpliedCallback, invokeCallbackFor } from './callback.ts'
+import type {
+  AnyFunction,
+  AnyMockable,
+  ParametersOf,
+  WithMatchers,
+} from './types.ts'
 
 export interface WhenOptions {
   ignoreExtraArgs?: boolean
@@ -12,6 +18,7 @@ export interface PlanOptions extends WhenOptions {
 }
 
 export type StubbingPlan =
+  | 'thenCallback'
   | 'thenDo'
   | 'thenReject'
   | 'thenResolve'
@@ -19,13 +26,12 @@ export type StubbingPlan =
   | 'thenThrow'
 
 export interface UseAction {
-  callCount: number
   plan: StubbingPlan
-  values: unknown[]
+  value: unknown
 }
 
 export interface BehaviorStack<TFunc extends AnyMockable> {
-  use: (args: ParametersOf<TFunc>, fallbackValue: unknown) => UseAction
+  use: (args: ParametersOf<TFunc>, fallbackValue?: AnyFunction) => UseAction
 
   getAll: () => readonly BehaviorEntry<ParametersOf<TFunc>>[]
 
@@ -65,31 +71,32 @@ export const createBehaviorStack = <
 
       if (!behavior) {
         unmatchedCalls.push(args)
-        return { callCount: 0, plan: 'thenDo', values: [fallbackValue] }
+        return { plan: 'thenDo', value: fallbackValue }
       }
+
+      const value = getCurrentStubbedValue(behavior)
 
       behavior.calls.push(args)
-      return {
-        callCount: behavior.callCount++,
-        plan: behavior.options.plan,
-        values: behavior.values,
-      }
+      behavior.callCount++
+
+      invokeCallbackFor(behavior, args)
+
+      return { plan: behavior.options.plan, value }
     },
 
-    addStubbing: (args, values, options) => {
-      behaviors.unshift({
-        args,
-        callCount: 0,
-        calls: [],
-        options,
-        values,
-      })
+    addStubbing: (rawArgs, values, options) => {
+      const args =
+        options.plan === 'thenCallback'
+          ? concatImpliedCallback(rawArgs)
+          : rawArgs
+
+      behaviors.unshift({ args, callCount: 0, calls: [], options, values })
     },
   }
 }
 
-const behaviorMatches = <TArgs extends unknown[]>(actualArguments: TArgs) => {
-  return (behavior: BehaviorEntry<TArgs>): boolean => {
+const behaviorMatches = (actualArguments: unknown[]) => {
+  return (behavior: BehaviorEntry<unknown[]>): boolean => {
     const { callCount, options } = behavior
     const { times } = options
 
@@ -107,4 +114,12 @@ const behaviorMatches = <TArgs extends unknown[]>(actualArguments: TArgs) => {
       return equals(actualArguments[index], expectedArgument)
     })
   }
+}
+
+const getCurrentStubbedValue = (
+  behavior: BehaviorEntry<unknown[]>,
+): unknown => {
+  const { callCount, values } = behavior
+  const hasMoreValues = callCount < values.length
+  return hasMoreValues ? values[callCount] : values.at(-1)
 }

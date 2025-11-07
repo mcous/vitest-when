@@ -8,11 +8,6 @@ import type { StubbingPlan } from './behaviors.ts'
 import { getBehaviorStack } from './stubs.ts'
 import type { MockInstance } from './types.ts'
 
-interface Behavior {
-  type: StubbingPlan
-  values: readonly unknown[]
-}
-
 export interface DebugResult {
   name: string
   description: string

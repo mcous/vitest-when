@@ -13,6 +13,10 @@ import type {
 } from './types.ts'
 
 export type { WhenOptions } from './behaviors.ts'
+export {
+  createCallbackMatcher as expectCallback,
+  nextTick,
+} from './callback.ts'
 export type { DebugResult, Stubbing } from './debug.ts'
 export * from './errors.ts'
 
@@ -28,6 +32,7 @@ export interface Stub<TFunc extends AnyMockable> {
   thenThrow: (...errors: unknown[]) => Mock<TFunc>
   thenReject: (...errors: unknown[]) => Mock<TFunc>
   thenDo: (...callbacks: AsFunction<TFunc>[]) => Mock<TFunc>
+  thenCallback: (...args: unknown[]) => Mock<TFunc>
 }
 
 export const when = <TFunc extends AnyMockable>(
@@ -73,6 +78,13 @@ export const when = <TFunc extends AnyMockable>(
           behaviorStack.addStubbing(args, callbacks, {
             ...options,
             plan: 'thenDo',
+          })
+          return result
+        },
+        thenCallback: (...callbackArguments) => {
+          behaviorStack.addStubbing(args, callbackArguments, {
+            ...options,
+            plan: 'thenCallback',
           })
           return result
         },

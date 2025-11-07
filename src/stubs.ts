@@ -29,15 +29,11 @@ export const configureMock = <TFunc extends AnyMockable>(
   const behaviorStack = createBehaviorStack<TFunc>()
   const fallbackImplementation = getFallbackImplementation(mock)
 
-  function implementation(this: ThisType<TFunc>, ...args: ParametersOf<TFunc>) {
-    const { callCount, plan, values } = behaviorStack.use(
-      args,
-      fallbackImplementation,
-    )
-    const hasMoreValues = callCount < values.length
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const value: unknown = hasMoreValues ? values[callCount] : values.at(-1)
+  function implementation(
+    this: ThisType<TFunc>,
+    ...args: ParametersOf<TFunc>
+  ): unknown {
+    const { plan, value } = behaviorStack.use(args, fallbackImplementation)
 
     switch (plan) {
       case 'thenReturn': {
@@ -54,10 +50,14 @@ export const configureMock = <TFunc extends AnyMockable>(
         return Promise.reject(value)
       }
       case 'thenDo': {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return typeof value === 'function'
           ? value.call(this, ...args)
           : undefined
+      }
+      case 'thenCallback': {
+        // Callback is called during `behaviorStack.use()` so there's nothing to
+        // do here.
+        return undefined
       }
     }
   }

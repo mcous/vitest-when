@@ -90,9 +90,7 @@ describe('vitest-when debug', () => {
         },
       ],
       unmatchedCalls: [[1234]],
-      description: expect.stringMatching(
-        /1 call:\n\s+- \(1234\)/,
-      ) as string,
+      description: expect.stringMatching(/1 call:\n\s+- \(1234\)/) as string,
     } satisfies subject.DebugResult)
   })
 

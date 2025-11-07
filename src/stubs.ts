@@ -1,8 +1,4 @@
-import {
-  type BehaviorStack,
-  BehaviorType,
-  createBehaviorStack,
-} from './behaviors.ts'
+import { type BehaviorStack, createBehaviorStack } from './behaviors.ts'
 import { NotAMockFunctionError } from './errors.ts'
 import { getFallbackImplementation } from './fallback-implementation.ts'
 import type {
@@ -34,32 +30,34 @@ export const configureMock = <TFunc extends AnyMockable>(
   const fallbackImplementation = getFallbackImplementation(mock)
 
   function implementation(this: ThisType<TFunc>, ...args: ParametersOf<TFunc>) {
-    const behavior = behaviorStack.use(args)?.behavior ?? {
-      type: BehaviorType.DO,
-      callback: fallbackImplementation,
-    }
+    const { callCount, plan, values } = behaviorStack.use(
+      args,
+      fallbackImplementation,
+    )
+    const hasMoreValues = callCount < values.length
 
-    switch (behavior.type) {
-      case BehaviorType.RETURN: {
-        return behavior.value
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const value: unknown = hasMoreValues ? values[callCount] : values.at(-1)
+
+    switch (plan) {
+      case 'thenReturn': {
+        return value
       }
-
-      case BehaviorType.RESOLVE: {
-        return Promise.resolve(behavior.value)
+      case 'thenThrow': {
+        throw value
       }
-
-      case BehaviorType.THROW: {
-        throw behavior.error
+      case 'thenResolve': {
+        return Promise.resolve(value)
       }
-
-      case BehaviorType.REJECT: {
+      case 'thenReject': {
         // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-        return Promise.reject(behavior.error)
+        return Promise.reject(value)
       }
-
-      case BehaviorType.DO: {
+      case 'thenDo': {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return behavior.callback?.call(this, ...args)
+        return typeof value === 'function'
+          ? value.call(this, ...args)
+          : undefined
       }
     }
   }

@@ -3,9 +3,14 @@ import {
   plugins as prettyFormatPlugins,
 } from 'pretty-format'
 
-import { type Behavior, BehaviorType } from './behaviors.ts'
+import type { StubbingPlan } from './behaviors.ts'
 import { getBehaviorStack } from './stubs.ts'
 import type { MockInstance } from './types.ts'
+
+interface Behavior {
+  type: StubbingPlan
+  values: readonly unknown[]
+}
 
 export interface DebugResult {
   name: string
@@ -27,7 +32,7 @@ export const getDebug = (mock: MockInstance): DebugResult => {
   const stubbings =
     behaviors?.getAll().map((entry) => ({
       args: entry.args,
-      behavior: entry.behavior,
+      behavior: { type: entry.options.plan, values: entry.values },
       calls: entry.calls,
     })) ?? []
 
@@ -68,24 +73,24 @@ const formatCall = (args: readonly unknown[]): string => {
 
 const formatBehavior = (behavior: Behavior): string => {
   switch (behavior.type) {
-    case BehaviorType.RETURN: {
-      return `=> ${stringify(behavior.value)}`
+    case 'thenReturn': {
+      return `=> ${stringify(behavior.values[0])}`
     }
 
-    case BehaviorType.RESOLVE: {
-      return `=> Promise.resolve(${stringify(behavior.value)})`
+    case 'thenResolve': {
+      return `=> Promise.resolve(${stringify(behavior.values[0])})`
     }
 
-    case BehaviorType.THROW: {
-      return `=> { throw ${stringify(behavior.error)} }`
+    case 'thenThrow': {
+      return `=> { throw ${stringify(behavior.values[0])} }`
     }
 
-    case BehaviorType.REJECT: {
-      return `=> Promise.reject(${stringify(behavior.error)})`
+    case 'thenReject': {
+      return `=> Promise.reject(${stringify(behavior.values[0])})`
     }
 
-    case BehaviorType.DO: {
-      return `=> ${stringify(behavior.callback)}()`
+    case 'thenDo': {
+      return `=> ${stringify(behavior.values[0])}()`
     }
   }
 }

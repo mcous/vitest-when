@@ -12,7 +12,7 @@ import type {
   WithMatchers,
 } from './types.ts'
 
-export { type Behavior, BehaviorType, type WhenOptions } from './behaviors.ts'
+export type { WhenOptions } from './behaviors.ts'
 export type { DebugResult, Stubbing } from './debug.ts'
 export * from './errors.ts'
 
@@ -40,27 +40,40 @@ export const when = <TFunc extends AnyMockable>(
 
   return {
     calledWith: (...args) => {
-      const behaviors = behaviorStack.bindArgs(args, options)
-
       return {
         thenReturn: (...values) => {
-          behaviors.addReturn(values)
+          behaviorStack.addStubbing(args, values, {
+            ...options,
+            plan: 'thenReturn',
+          })
           return result
         },
         thenResolve: (...values) => {
-          behaviors.addResolve(values)
+          behaviorStack.addStubbing(args, values, {
+            ...options,
+            plan: 'thenResolve',
+          })
           return result
         },
         thenThrow: (...errors) => {
-          behaviors.addThrow(errors)
+          behaviorStack.addStubbing(args, errors, {
+            ...options,
+            plan: 'thenThrow',
+          })
           return result
         },
         thenReject: (...errors) => {
-          behaviors.addReject(errors)
+          behaviorStack.addStubbing(args, errors, {
+            ...options,
+            plan: 'thenReject',
+          })
           return result
         },
         thenDo: (...callbacks) => {
-          behaviors.addDo(callbacks)
+          behaviorStack.addStubbing(args, callbacks, {
+            ...options,
+            plan: 'thenDo',
+          })
           return result
         },
       }

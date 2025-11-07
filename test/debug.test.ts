@@ -32,7 +32,7 @@ describe('vitest-when debug', () => {
       stubbings: [
         {
           args: ['hello', 'world'],
-          behavior: { type: 'return', value: 42 },
+          behavior: { type: 'thenReturn', values: [42] },
           calls: [],
         },
       ],
@@ -56,7 +56,7 @@ describe('vitest-when debug', () => {
       stubbings: [
         {
           args: [expect.any(String)],
-          behavior: { type: 'return', value: 42 },
+          behavior: { type: 'thenReturn', values: [42] },
           calls: [['hello'], ['world']],
         },
       ],
@@ -79,7 +79,7 @@ describe('vitest-when debug', () => {
       stubbings: [
         {
           args: [expect.any(String)],
-          behavior: { type: 'return', value: 42 },
+          behavior: { type: 'thenReturn', values: [42] },
           calls: [],
         },
       ],

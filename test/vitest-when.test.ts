@@ -279,4 +279,28 @@ describe('vitest-when', () => {
     // intentionally do not call the spy
     expect(true).toBe(true)
   })
+
+  it('should ignore extra args if configured', () => {
+    const spy = subject
+      .when(vi.fn(), { ignoreExtraArgs: true })
+      .calledWith('Outcomes are:')
+      .thenReturn('loggy')
+
+    expect(spy('Outcomes are:')).toEqual('loggy')
+    expect(spy('Outcomes are:', 'stuff')).toEqual('loggy')
+    expect(spy('Outcomes are:', 'stuff', 'that', 'keeps', 'going')).toEqual(
+      'loggy',
+    )
+    expect(spy('Outcomes are not:', 'stuff')).toEqual(undefined)
+  })
+
+  it('should ignore all args if configured', () => {
+    const spy = subject
+      .when(vi.fn(), { ignoreExtraArgs: true })
+      .calledWith()
+      .thenReturn('yesss')
+
+    expect(spy()).toEqual('yesss')
+    expect(spy(1, 2, 3, 4, 5)).toEqual('yesss')
+  })
 })

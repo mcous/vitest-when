@@ -10,6 +10,7 @@ import type {
 } from './types.ts'
 
 export interface WhenOptions {
+  ignoreExtraArgs?: boolean
   times?: number
 }
 
@@ -40,6 +41,7 @@ export interface BehaviorEntry<TArgs extends unknown[]> {
   args: WithMatchers<TArgs>
   behavior: Behavior
   calls: TArgs[]
+  ignoreExtraArgs: boolean
   maxCallCount?: number | undefined
 }
 
@@ -60,6 +62,7 @@ export type Behavior =
 
 export interface BehaviorOptions<TValue> {
   value: TValue
+  ignoreExtraArgs: boolean
   maxCallCount: number | undefined
 }
 
@@ -92,8 +95,9 @@ export const createBehaviorStack = <
       addReturn: (values) => {
         behaviors.unshift(
           ...getBehaviorOptions(values, options).map(
-            ({ value, maxCallCount }) => ({
+            ({ value, ignoreExtraArgs, maxCallCount }) => ({
               args,
+              ignoreExtraArgs,
               maxCallCount,
               behavior: { type: BehaviorType.RETURN, value },
               calls: [],
@@ -104,8 +108,9 @@ export const createBehaviorStack = <
       addResolve: (values) => {
         behaviors.unshift(
           ...getBehaviorOptions(values, options).map(
-            ({ value, maxCallCount }) => ({
+            ({ value, ignoreExtraArgs, maxCallCount }) => ({
               args,
+              ignoreExtraArgs,
               maxCallCount,
               behavior: { type: BehaviorType.RESOLVE, value },
               calls: [],
@@ -116,8 +121,9 @@ export const createBehaviorStack = <
       addThrow: (values) => {
         behaviors.unshift(
           ...getBehaviorOptions(values, options).map(
-            ({ value, maxCallCount }) => ({
+            ({ value, ignoreExtraArgs, maxCallCount }) => ({
               args,
+              ignoreExtraArgs,
               maxCallCount,
               behavior: { type: BehaviorType.THROW, error: value },
               calls: [],
@@ -128,8 +134,9 @@ export const createBehaviorStack = <
       addReject: (values) => {
         behaviors.unshift(
           ...getBehaviorOptions(values, options).map(
-            ({ value, maxCallCount }) => ({
+            ({ value, ignoreExtraArgs, maxCallCount }) => ({
               args,
+              ignoreExtraArgs,
               maxCallCount,
               behavior: { type: BehaviorType.REJECT, error: value },
               calls: [],
@@ -140,8 +147,9 @@ export const createBehaviorStack = <
       addDo: (values) => {
         behaviors.unshift(
           ...getBehaviorOptions(values, options).map(
-            ({ value, maxCallCount }) => ({
+            ({ value, ignoreExtraArgs, maxCallCount }) => ({
               args,
+              ignoreExtraArgs,
               maxCallCount,
               behavior: {
                 type: BehaviorType.DO,
@@ -158,7 +166,7 @@ export const createBehaviorStack = <
 
 const getBehaviorOptions = <TValue>(
   values: TValue[],
-  { times }: WhenOptions,
+  { ignoreExtraArgs, times }: WhenOptions,
 ): BehaviorOptions<TValue>[] => {
   if (values.length === 0) {
     values = [undefined as TValue]
@@ -166,6 +174,7 @@ const getBehaviorOptions = <TValue>(
 
   return values.map((value, index) => ({
     value,
+    ignoreExtraArgs: ignoreExtraArgs ?? false,
     maxCallCount: times ?? (index < values.length - 1 ? 1 : undefined),
   }))
 }
@@ -179,18 +188,17 @@ const behaviorAvailable = <TArgs extends unknown[]>(
   )
 }
 
-const behaviorMatches = <TArgs extends unknown[]>(args: TArgs) => {
+const behaviorMatches = <TArgs extends unknown[]>(actualArguments: TArgs) => {
   return (behavior: BehaviorEntry<TArgs>): boolean => {
-    let index = 0
+    // Check arity
+    const expectedArguments = behavior.args
+    const { ignoreExtraArgs } = behavior
+    if (expectedArguments.length !== actualArguments.length && !ignoreExtraArgs)
+      return false
 
-    while (index < args.length || index < behavior.args.length) {
-      if (!equals(args[index], behavior.args[index])) {
-        return false
-      }
-
-      index += 1
-    }
-
-    return true
+    // Check arguments
+    return expectedArguments.every((expectedArgument, index) => {
+      return equals(actualArguments[index], expectedArgument)
+    })
   }
 }

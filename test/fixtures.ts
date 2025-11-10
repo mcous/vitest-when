@@ -31,6 +31,10 @@ export function overloaded(input?: number): string | boolean {
   throw new Error(`overloaded(${input})`)
 }
 
+export function extraArguments(first: number, second: number): string {
+  throw new Error(`extraArguments(${first}, ${second})`)
+}
+
 export class SimpleClass {
   constructor(input: number) {
     throw new Error(`SimpleClass(${input})`)

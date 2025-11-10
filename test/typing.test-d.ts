@@ -16,6 +16,7 @@ import {
 import * as subject from '../src/vitest-when.ts'
 import {
   complex,
+  extraArguments,
   generic,
   overloaded,
   simple,
@@ -42,6 +43,17 @@ describe('vitest-when type signatures', () => {
 
     expectTypeOf(result).toEqualTypeOf<
       MockedFunction<(input: number) => string>
+    >()
+  })
+
+  it('should handle fewer than required arguments', () => {
+    const result = subject
+      .when(extraArguments, { ignoreExtraArgs: true })
+      .calledWith(1)
+      .thenReturn('hello')
+
+    expectTypeOf(result).toEqualTypeOf<
+      MockedFunction<(input: number, second: number) => string>
     >()
   })
 

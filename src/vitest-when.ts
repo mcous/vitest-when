@@ -22,6 +22,12 @@ export interface StubWrapper<TFunc extends AnyMockable> {
   ): Stub<TFunc>
 }
 
+export interface StubWrapperFlexible<TFunc extends AnyMockable> {
+  calledWith<TArgs extends ParametersOf<TFunc>>(
+    ...args: Partial<WithMatchers<TArgs>>
+  ): Stub<TFunc>
+}
+
 export interface Stub<TFunc extends AnyMockable> {
   thenReturn: (...values: ReturnTypeOf<TFunc>[]) => Mock<TFunc>
   thenResolve: (...values: Awaited<ReturnTypeOf<TFunc>>[]) => Mock<TFunc>
@@ -30,10 +36,18 @@ export interface Stub<TFunc extends AnyMockable> {
   thenDo: (...callbacks: AsFunction<TFunc>[]) => Mock<TFunc>
 }
 
-export const when = <TFunc extends AnyMockable>(
+export function when<TFunc extends AnyMockable>(
+  mock: TFunc | MockInstance<TFunc>,
+  options: WhenOptions<true>,
+): StubWrapperFlexible<NormalizeMockable<TFunc>>
+export function when<TFunc extends AnyMockable>(
+  mock: TFunc | MockInstance<TFunc>,
+  options?: WhenOptions<false>,
+): StubWrapper<NormalizeMockable<TFunc>>
+export function when<TFunc extends AnyMockable>(
   mock: TFunc | MockInstance<TFunc>,
   options: WhenOptions = {},
-): StubWrapper<NormalizeMockable<TFunc>> => {
+): StubWrapper<NormalizeMockable<TFunc>> {
   const validatedMock = validateMock(mock)
   const behaviorStack = configureMock(validatedMock)
   const result = asMock(validatedMock)

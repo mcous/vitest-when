@@ -190,13 +190,12 @@ const behaviorAvailable = <TArgs extends unknown[]>(
 
 const behaviorMatches = <TArgs extends unknown[]>(actualArguments: TArgs) => {
   return (behavior: BehaviorEntry<TArgs>): boolean => {
-    // Check arity
     const expectedArguments = behavior.args
-    const { ignoreExtraArgs } = behavior
-    if (expectedArguments.length !== actualArguments.length && !ignoreExtraArgs)
+    const arityMatches = expectedArguments.length === actualArguments.length
+    if (!arityMatches && !behavior.ignoreExtraArgs) {
       return false
+    }
 
-    // Check arguments
     return expectedArguments.every((expectedArgument, index) => {
       return equals(actualArguments[index], expectedArgument)
     })

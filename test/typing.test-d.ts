@@ -75,6 +75,14 @@ describe('vitest-when type signatures', () => {
     subject
       .when(multipleArgs, { ignoreExtraArgs: true })
       .calledWith(expect.any(Number), expect.any(String), expect.any(Boolean))
+
+    subject.when(multipleArgs, { ignoreExtraArgs: true }).calledWith(
+      // @ts-expect-error: too many arguments
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    )
   })
 
   it('returns mock type for then resolve', () => {

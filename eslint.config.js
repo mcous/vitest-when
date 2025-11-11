@@ -14,5 +14,17 @@ export default defineConfig(
       'unicorn/no-array-reverse': 'off',
     },
   },
+  {
+    files: ['src/types.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+  {
+    files: ['test/typing.test-d.ts'],
+    rules: {
+      '@typescript-eslint/no-unsafe-argument': 'off',
+    },
+  },
   globalIgnores(['**/coverage/**', '**/dist/**']),
 )

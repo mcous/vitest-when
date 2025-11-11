@@ -10,7 +10,6 @@ import type {
   NormalizeMockable,
   ParametersOf,
   ReturnTypeOf,
-  WithMatchers,
 } from './types.ts'
 
 export { type Behavior, BehaviorType, type WhenOptions } from './behaviors.ts'
@@ -21,9 +20,7 @@ export interface StubWrapper<
   TFunc extends AnyMockable,
   TOptions extends WhenOptions | undefined,
 > {
-  calledWith<TArgs extends ArgumentsSpec<ParametersOf<TFunc>, TOptions>>(
-    ...args: WithMatchers<TArgs>
-  ): Stub<TFunc>
+  calledWith(...args: ArgumentsSpec<ParametersOf<TFunc>, TOptions>): Stub<TFunc>
 }
 
 export interface Stub<TFunc extends AnyMockable> {

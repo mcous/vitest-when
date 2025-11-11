@@ -281,7 +281,7 @@ describe('vitest-when', () => {
   })
 
   it.each([
-    { stubArgs: [] as unknown[], callArgs: [] as unknown[] },
+    { stubArgs: [], callArgs: [] },
     { stubArgs: [], callArgs: ['a'] },
     { stubArgs: [], callArgs: ['a', 'b'] },
     { stubArgs: ['a'], callArgs: ['a'] },
@@ -300,7 +300,7 @@ describe('vitest-when', () => {
   )
 
   it.each([
-    { stubArgs: ['a'] as unknown[], callArgs: ['b'] as unknown[] },
+    { stubArgs: ['a'], callArgs: ['b'] },
     { stubArgs: [undefined], callArgs: [] },
   ])(
     'does not match call $callArgs against stub $stubArgs with ignoreExtraArgs',

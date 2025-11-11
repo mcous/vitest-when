@@ -39,11 +39,11 @@ export interface Stub<TFunc extends AnyMockable> {
 
 export function when<TFunc extends AnyMockable>(
   mock: TFunc | MockInstance<TFunc>,
-  options: WhenOptions<true>,
+  options: { ignoreExtraArgs: true } & WhenOptions,
 ): StubWrapperFlexible<NormalizeMockable<TFunc>>
 export function when<TFunc extends AnyMockable>(
   mock: TFunc | MockInstance<TFunc>,
-  options?: WhenOptions<false>,
+  options?: WhenOptions,
 ): StubWrapper<NormalizeMockable<TFunc>>
 export function when<TFunc extends AnyMockable>(
   mock: TFunc | MockInstance<TFunc>,

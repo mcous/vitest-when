@@ -9,8 +9,8 @@ import type {
   WithMatchers,
 } from './types.ts'
 
-export interface WhenOptions<TIgnore extends boolean = boolean> {
-  ignoreExtraArgs?: TIgnore
+export interface WhenOptions {
+  ignoreExtraArgs?: boolean
   times?: number
 }
 

@@ -83,10 +83,13 @@ export type Mock<TFunc extends AnyMockable> = TFunc extends AnyConstructor
     ? MockedFunction<TFunc>
     : never
 
+/** If the type is any, return Yes, otherwise return No */
+type IfAny<T, Yes, No> = 0 extends (1 & T) ? Yes : No; 
+
 /** Produce a union of progressively longer tuples based on the input tuple */
 export type PartialArguments<
   Tuple extends any[],
   _Previous extends any[] = [],
 > = Tuple extends [infer First, ...infer Rest]
   ? [..._Previous, First] | PartialArguments<Rest, [..._Previous, First]>
-  : never
+  : IfAny<Tuple[number], any[], []>

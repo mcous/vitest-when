@@ -280,27 +280,37 @@ describe('vitest-when', () => {
     expect(true).toBe(true)
   })
 
-  it('should ignore extra args if configured', () => {
-    const spy = subject
-      .when(vi.fn(), { ignoreExtraArgs: true })
-      .calledWith('Outcomes are:')
-      .thenReturn('loggy')
+  it.each([
+    { stubArgs: [] as unknown[], callArgs: [] as unknown[] },
+    { stubArgs: [], callArgs: ['a'] },
+    { stubArgs: [], callArgs: ['a', 'b'] },
+    { stubArgs: ['a'], callArgs: ['a'] },
+    { stubArgs: ['a'], callArgs: ['a', 'b'] },
+    { stubArgs: ['a', 'b'], callArgs: ['a', 'b'] },
+  ])(
+    'matches call $callArgs against stub $stubArgs args with ignoreExtraArgs',
+    ({ stubArgs, callArgs }) => {
+      const spy = subject
+        .when(vi.fn().mockReturnValue('failure'), { ignoreExtraArgs: true })
+        .calledWith(...stubArgs)
+        .thenReturn('success')
 
-    expect(spy('Outcomes are:')).toEqual('loggy')
-    expect(spy('Outcomes are:', 'stuff')).toEqual('loggy')
-    expect(spy('Outcomes are:', 'stuff', 'that', 'keeps', 'going')).toEqual(
-      'loggy',
-    )
-    expect(spy('Outcomes are not:', 'stuff')).toEqual(undefined)
-  })
+      expect(spy(...callArgs)).toEqual('success')
+    },
+  )
 
-  it('should ignore all args if configured', () => {
-    const spy = subject
-      .when(vi.fn(), { ignoreExtraArgs: true })
-      .calledWith()
-      .thenReturn('yesss')
+  it.each([
+    { stubArgs: ['a'] as unknown[], callArgs: ['b'] as unknown[] },
+    { stubArgs: [undefined], callArgs: [] },
+  ])(
+    'does not match call $callArgs against stub $stubArgs with ignoreExtraArgs',
+    ({ stubArgs, callArgs }) => {
+      const spy = subject
+        .when(vi.fn().mockReturnValue('success'), { ignoreExtraArgs: true })
+        .calledWith(...stubArgs)
+        .thenReturn('failure')
 
-    expect(spy()).toEqual('yesss')
-    expect(spy(1, 2, 3, 4, 5)).toEqual('yesss')
-  })
+      expect(spy(...callArgs)).toBe('success')
+    },
+  )
 })

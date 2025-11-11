@@ -75,7 +75,7 @@ export const createBehaviorStack = <
 
     use: (args) => {
       const behavior = behaviors
-        .filter((b) => behaviorAvailable(b))
+        .filter(behaviorAvailable)
         .find(behaviorMatches(args))
 
       if (!behavior) {
@@ -184,16 +184,19 @@ const behaviorAvailable = <TArgs extends unknown[]>(
   )
 }
 
-const behaviorMatches = <TArgs extends unknown[]>(actualArguments: TArgs) => {
-  return (behavior: BehaviorEntry<TArgs>): boolean => {
-    const expectedArguments = behavior.args
-    const arityMatches = expectedArguments.length === actualArguments.length
-    if (!arityMatches && !behavior.ignoreExtraArgs) {
+const behaviorMatches = <TArgs extends unknown[]>(actualArgs: TArgs) => {
+  return (behaviorEntry: BehaviorEntry<TArgs>): boolean => {
+    const { args: expectedArgs, ignoreExtraArgs } = behaviorEntry
+    const isArgsLengthMatch = ignoreExtraArgs
+      ? expectedArgs.length <= actualArgs.length
+      : expectedArgs.length === actualArgs.length
+
+    if (!isArgsLengthMatch) {
       return false
     }
 
-    return expectedArguments.every((expectedArgument, index) => {
-      return equals(actualArguments[index], expectedArgument)
-    })
+    return expectedArgs.every((expected, index) =>
+      equals(actualArgs[index], expected),
+    )
   }
 }

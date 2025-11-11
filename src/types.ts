@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /** Common type definitions. */
-import type { AsymmetricMatcher } from '@vitest/expect'
 import type { MockedClass, MockedFunction } from 'vitest'
 
 /** Any function. */
@@ -80,11 +78,6 @@ export type ConstructorImplementation<
 > =
   | (new (...args: ConstructorParameters<TFunc>) => InstanceType<TFunc>)
   | ((this: InstanceType<TFunc>, ...args: ConstructorParameters<TFunc>) => void)
-
-/** Accept a value or an AsymmetricMatcher in an arguments array */
-export type WithMatchers<T extends unknown[]> = {
-  [K in keyof T]: AsymmetricMatcher<unknown> | T[K]
-}
 
 /** A mocked function or constructor. */
 export type Mock<TFunc extends AnyMockable> = TFunc extends AnyConstructor

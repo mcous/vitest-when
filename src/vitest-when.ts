@@ -8,6 +8,7 @@ import type {
   MockInstance,
   NormalizeMockable,
   ParametersOf,
+  PartialArguments,
   ReturnTypeOf,
   WithMatchers,
 } from './types.ts'
@@ -24,7 +25,7 @@ export interface StubWrapper<TFunc extends AnyMockable> {
 
 export interface StubWrapperFlexible<TFunc extends AnyMockable> {
   calledWith<TArgs extends ParametersOf<TFunc>>(
-    ...args: Partial<WithMatchers<TArgs>>
+    ...args: PartialArguments<WithMatchers<TArgs>>
   ): Stub<TFunc>
 }
 

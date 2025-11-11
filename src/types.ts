@@ -82,3 +82,11 @@ export type Mock<TFunc extends AnyMockable> = TFunc extends AnyConstructor
   : TFunc extends AnyFunction
     ? MockedFunction<TFunc>
     : never
+
+/** Produce a union of progressively longer tuples based on the input tuple */
+export type PartialArguments<
+  Tuple extends any[],
+  _Previous extends any[] = [],
+> = Tuple extends [infer First, ...infer Rest]
+  ? [..._Previous, First] | PartialArguments<Rest, [..._Previous, First]>
+  : never

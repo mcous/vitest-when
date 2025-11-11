@@ -57,6 +57,13 @@ describe('vitest-when type signatures', () => {
     >()
   })
 
+  it('should ensure correct type of previous arguments', () => {
+    subject
+      .when(extraArguments, { ignoreExtraArgs: true })
+      /* @ts-expect-error: first arg is not correct */
+      .calledWith(undefined, 2)
+  })
+
   it('returns mock type for then resolve', () => {
     const result = subject.when(simpleAsync).calledWith(1).thenResolve('hello')
 

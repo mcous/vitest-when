@@ -205,9 +205,10 @@ expect(mock()).toBe(undefined)
 import type { WhenOptions } from 'vitest-when'
 ```
 
-| option  | default | type    | description                                        |
-| ------- | ------- | ------- | -------------------------------------------------- |
-| `times` | N/A     | integer | Only trigger configured behavior a number of times |
+| option            | default | type    | description                                        |
+| ----------------- | ------- | ------- | -------------------------------------------------- |
+| `ignoreExtraArgs` | `false` | boolean | Ignore extra arguments when matching arguments     |
+| `times`           | N/A     | integer | Only trigger configured behavior a number of times |
 
 ### `.calledWith(...args: Parameters<TFunc>): Stub<TFunc>`
 
@@ -304,6 +305,17 @@ const mock = when(vi.fn()).calledWith('hello').thenReturn('hi', 'sup?')
 expect(mock('hello')).toEqual('hi')
 expect(mock('hello')).toEqual('sup?')
 expect(mock('hello')).toEqual('sup?')
+```
+
+You can also ignore extra arguments when matching arguments.
+
+```ts
+const mock = when(vi.fn(), { ignoreExtraArgs: true })
+  .calledWith('hello')
+  .thenReturn('world')
+
+expect(mock('hello')).toEqual('world')
+expect(mock('hello', 'jello')).toEqual('world')
 ```
 
 ### `.thenResolve(value: TReturn) -> Mock<TFunc>`

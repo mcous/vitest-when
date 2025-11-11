@@ -6,10 +6,10 @@ import type {
   AsFunction,
   ParametersOf,
   ReturnTypeOf,
-  WithMatchers,
 } from './types.ts'
 
 export interface WhenOptions {
+  ignoreExtraArgs?: boolean
   times?: number
 }
 
@@ -22,10 +22,7 @@ export interface BehaviorStack<TFunc extends AnyMockable> {
 
   getUnmatchedCalls: () => readonly ParametersOf<TFunc>[]
 
-  bindArgs: (
-    args: WithMatchers<ParametersOf<TFunc>>,
-    options: WhenOptions,
-  ) => BoundBehaviorStack<TFunc>
+  bindArgs: (args: unknown[], options: WhenOptions) => BoundBehaviorStack<TFunc>
 }
 
 export interface BoundBehaviorStack<TFunc extends AnyMockable> {
@@ -37,9 +34,10 @@ export interface BoundBehaviorStack<TFunc extends AnyMockable> {
 }
 
 export interface BehaviorEntry<TArgs extends unknown[]> {
-  args: WithMatchers<TArgs>
+  args: unknown[]
   behavior: Behavior
   calls: TArgs[]
+  ignoreExtraArgs: boolean
   maxCallCount?: number | undefined
 }
 
@@ -60,6 +58,7 @@ export type Behavior =
 
 export interface BehaviorOptions<TValue> {
   value: TValue
+  ignoreExtraArgs: boolean
   maxCallCount: number | undefined
 }
 
@@ -76,7 +75,7 @@ export const createBehaviorStack = <
 
     use: (args) => {
       const behavior = behaviors
-        .filter((b) => behaviorAvailable(b))
+        .filter(behaviorAvailable)
         .find(behaviorMatches(args))
 
       if (!behavior) {
@@ -92,8 +91,9 @@ export const createBehaviorStack = <
       addReturn: (values) => {
         behaviors.unshift(
           ...getBehaviorOptions(values, options).map(
-            ({ value, maxCallCount }) => ({
+            ({ value, ignoreExtraArgs, maxCallCount }) => ({
               args,
+              ignoreExtraArgs,
               maxCallCount,
               behavior: { type: BehaviorType.RETURN, value },
               calls: [],
@@ -104,8 +104,9 @@ export const createBehaviorStack = <
       addResolve: (values) => {
         behaviors.unshift(
           ...getBehaviorOptions(values, options).map(
-            ({ value, maxCallCount }) => ({
+            ({ value, ignoreExtraArgs, maxCallCount }) => ({
               args,
+              ignoreExtraArgs,
               maxCallCount,
               behavior: { type: BehaviorType.RESOLVE, value },
               calls: [],
@@ -116,8 +117,9 @@ export const createBehaviorStack = <
       addThrow: (values) => {
         behaviors.unshift(
           ...getBehaviorOptions(values, options).map(
-            ({ value, maxCallCount }) => ({
+            ({ value, ignoreExtraArgs, maxCallCount }) => ({
               args,
+              ignoreExtraArgs,
               maxCallCount,
               behavior: { type: BehaviorType.THROW, error: value },
               calls: [],
@@ -128,8 +130,9 @@ export const createBehaviorStack = <
       addReject: (values) => {
         behaviors.unshift(
           ...getBehaviorOptions(values, options).map(
-            ({ value, maxCallCount }) => ({
+            ({ value, ignoreExtraArgs, maxCallCount }) => ({
               args,
+              ignoreExtraArgs,
               maxCallCount,
               behavior: { type: BehaviorType.REJECT, error: value },
               calls: [],
@@ -140,8 +143,9 @@ export const createBehaviorStack = <
       addDo: (values) => {
         behaviors.unshift(
           ...getBehaviorOptions(values, options).map(
-            ({ value, maxCallCount }) => ({
+            ({ value, ignoreExtraArgs, maxCallCount }) => ({
               args,
+              ignoreExtraArgs,
               maxCallCount,
               behavior: {
                 type: BehaviorType.DO,
@@ -158,7 +162,7 @@ export const createBehaviorStack = <
 
 const getBehaviorOptions = <TValue>(
   values: TValue[],
-  { times }: WhenOptions,
+  { ignoreExtraArgs, times }: WhenOptions,
 ): BehaviorOptions<TValue>[] => {
   if (values.length === 0) {
     values = [undefined as TValue]
@@ -166,6 +170,7 @@ const getBehaviorOptions = <TValue>(
 
   return values.map((value, index) => ({
     value,
+    ignoreExtraArgs: ignoreExtraArgs ?? false,
     maxCallCount: times ?? (index < values.length - 1 ? 1 : undefined),
   }))
 }
@@ -179,18 +184,19 @@ const behaviorAvailable = <TArgs extends unknown[]>(
   )
 }
 
-const behaviorMatches = <TArgs extends unknown[]>(args: TArgs) => {
-  return (behavior: BehaviorEntry<TArgs>): boolean => {
-    let index = 0
+const behaviorMatches = <TArgs extends unknown[]>(actualArgs: TArgs) => {
+  return (behaviorEntry: BehaviorEntry<TArgs>): boolean => {
+    const { args: expectedArgs, ignoreExtraArgs } = behaviorEntry
+    const isArgsLengthMatch = ignoreExtraArgs
+      ? expectedArgs.length <= actualArgs.length
+      : expectedArgs.length === actualArgs.length
 
-    while (index < args.length || index < behavior.args.length) {
-      if (!equals(args[index], behavior.args[index])) {
-        return false
-      }
-
-      index += 1
+    if (!isArgsLengthMatch) {
+      return false
     }
 
-    return true
+    return expectedArgs.every((expected, index) =>
+      equals(actualArgs[index], expected),
+    )
   }
 }

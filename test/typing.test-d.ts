@@ -17,6 +17,7 @@ import * as subject from '../src/vitest-when.ts'
 import {
   complex,
   generic,
+  multipleArgs,
   overloaded,
   simple,
   simpleAsync,
@@ -43,6 +44,37 @@ describe('vitest-when type signatures', () => {
     expectTypeOf(result).toEqualTypeOf<
       MockedFunction<(input: number) => string>
     >()
+  })
+
+  it('should handle fewer than required arguments', () => {
+    subject.when(multipleArgs, { ignoreExtraArgs: true }).calledWith(42)
+
+    subject
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      .calledWith(42, 'hello')
+
+    subject
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      .calledWith(42, 'hello', true)
+
+    subject
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      // @ts-expect-error: too many arguments
+      .calledWith(42, 'hello', true, 'oh no')
+  })
+
+  it('supports using matchers with ignoreExtraArgs', () => {
+    subject
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      .calledWith(expect.any(Number))
+
+    subject
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      .calledWith(expect.any(Number), expect.any(String))
+
+    subject
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      .calledWith(expect.any(Number), expect.any(String), expect.any(Boolean))
   })
 
   it('returns mock type for then resolve', () => {

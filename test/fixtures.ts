@@ -17,6 +17,10 @@ export async function simpleAsync(input: number): Promise<string> {
   throw new Error(`simpleAsync(${input})`)
 }
 
+export function multipleArgs(a: number, b: string, c: boolean): string {
+  throw new Error(`multipleArgs(${a}, ${b}, ${c})`)
+}
+
 export function complex(input: { a: number; b: string }): string {
   throw new Error(`simple({ a: ${input.a}, b: ${input.b} })`)
 }

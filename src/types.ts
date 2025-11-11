@@ -49,6 +49,16 @@ export type ParametersOf<TFunc extends AnyMockable> =
       ? Parameters<TFunc>
       : never
 
+/** An arguments list, optionally without every argument specified */
+export type ArgumentsSpec<
+  TArgs extends any[],
+  TOptions extends { ignoreExtraArgs?: boolean } | undefined,
+> = TOptions extends { ignoreExtraArgs: true }
+  ? TArgs extends [infer Head, ...infer Tail]
+    ? [] | [Head] | [Head, ...ArgumentsSpec<Tail, TOptions>]
+    : TArgs
+  : TArgs
+
 /** Extract return type from either a function or constructor */
 export type ReturnTypeOf<TFunc extends AnyMockable> =
   TFunc extends AnyConstructor

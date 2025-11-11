@@ -17,6 +17,10 @@ export async function simpleAsync(input: number): Promise<string> {
   throw new Error(`simpleAsync(${input})`)
 }
 
+export function multipleArgs(a: number, b: string, c: boolean): string {
+  throw new Error(`multipleArgs(${a}, ${b}, ${c})`)
+}
+
 export function complex(input: { a: number; b: string }): string {
   throw new Error(`simple({ a: ${input.a}, b: ${input.b} })`)
 }
@@ -29,10 +33,6 @@ export function overloaded(): boolean
 export function overloaded(input: number): string
 export function overloaded(input?: number): string | boolean {
   throw new Error(`overloaded(${input})`)
-}
-
-export function extraArguments(first: number, second: number): string {
-  throw new Error(`extraArguments(${first}, ${second})`)
 }
 
 export class SimpleClass {

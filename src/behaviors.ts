@@ -6,7 +6,6 @@ import type {
   AsFunction,
   ParametersOf,
   ReturnTypeOf,
-  WithMatchers,
 } from './types.ts'
 
 export interface WhenOptions {
@@ -23,10 +22,7 @@ export interface BehaviorStack<TFunc extends AnyMockable> {
 
   getUnmatchedCalls: () => readonly ParametersOf<TFunc>[]
 
-  bindArgs: (
-    args: WithMatchers<ParametersOf<TFunc>>,
-    options: WhenOptions,
-  ) => BoundBehaviorStack<TFunc>
+  bindArgs: (args: unknown[], options: WhenOptions) => BoundBehaviorStack<TFunc>
 }
 
 export interface BoundBehaviorStack<TFunc extends AnyMockable> {
@@ -38,7 +34,7 @@ export interface BoundBehaviorStack<TFunc extends AnyMockable> {
 }
 
 export interface BehaviorEntry<TArgs extends unknown[]> {
-  args: WithMatchers<TArgs>
+  args: unknown[]
   behavior: Behavior
   calls: TArgs[]
   ignoreExtraArgs: boolean

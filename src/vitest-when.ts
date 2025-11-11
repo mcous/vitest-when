@@ -3,12 +3,12 @@ import { type DebugResult, getDebug } from './debug.ts'
 import { asMock, configureMock, validateMock } from './stubs.ts'
 import type {
   AnyMockable,
+  ArgumentsSpec,
   AsFunction,
   Mock,
   MockInstance,
   NormalizeMockable,
   ParametersOf,
-  PartialArguments,
   ReturnTypeOf,
   WithMatchers,
 } from './types.ts'
@@ -17,15 +17,12 @@ export { type Behavior, BehaviorType, type WhenOptions } from './behaviors.ts'
 export type { DebugResult, Stubbing } from './debug.ts'
 export * from './errors.ts'
 
-export interface StubWrapper<TFunc extends AnyMockable> {
-  calledWith<TArgs extends ParametersOf<TFunc>>(
+export interface StubWrapper<
+  TFunc extends AnyMockable,
+  TOptions extends WhenOptions | undefined,
+> {
+  calledWith<TArgs extends ArgumentsSpec<ParametersOf<TFunc>, TOptions>>(
     ...args: WithMatchers<TArgs>
-  ): Stub<TFunc>
-}
-
-export interface StubWrapperFlexible<TFunc extends AnyMockable> {
-  calledWith<TArgs extends ParametersOf<TFunc>>(
-    ...args: PartialArguments<WithMatchers<TArgs>>
   ): Stub<TFunc>
 }
 
@@ -37,25 +34,20 @@ export interface Stub<TFunc extends AnyMockable> {
   thenDo: (...callbacks: AsFunction<TFunc>[]) => Mock<TFunc>
 }
 
-export function when<TFunc extends AnyMockable>(
+export const when = <
+  TFunc extends AnyMockable,
+  TOptions extends WhenOptions | undefined = undefined,
+>(
   mock: TFunc | MockInstance<TFunc>,
-  options: { ignoreExtraArgs: true } & WhenOptions,
-): StubWrapperFlexible<NormalizeMockable<TFunc>>
-export function when<TFunc extends AnyMockable>(
-  mock: TFunc | MockInstance<TFunc>,
-  options?: WhenOptions,
-): StubWrapper<NormalizeMockable<TFunc>>
-export function when<TFunc extends AnyMockable>(
-  mock: TFunc | MockInstance<TFunc>,
-  options: WhenOptions = {},
-): StubWrapper<NormalizeMockable<TFunc>> {
+  options?: TOptions,
+): StubWrapper<NormalizeMockable<TFunc>, TOptions> => {
   const validatedMock = validateMock(mock)
   const behaviorStack = configureMock(validatedMock)
   const result = asMock(validatedMock)
 
   return {
     calledWith: (...args) => {
-      const behaviors = behaviorStack.bindArgs(args, options)
+      const behaviors = behaviorStack.bindArgs(args as unknown[], options ?? {})
 
       return {
         thenReturn: (...values) => {

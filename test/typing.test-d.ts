@@ -16,8 +16,8 @@ import {
 import * as subject from '../src/vitest-when.ts'
 import {
   complex,
-  extraArguments,
   generic,
+  multipleArgs,
   overloaded,
   simple,
   simpleAsync,
@@ -47,21 +47,34 @@ describe('vitest-when type signatures', () => {
   })
 
   it('should handle fewer than required arguments', () => {
-    const result = subject
-      .when(extraArguments, { ignoreExtraArgs: true })
-      .calledWith(1)
-      .thenReturn('hello')
+    subject.when(multipleArgs, { ignoreExtraArgs: true }).calledWith(42)
 
-    expectTypeOf(result).toEqualTypeOf<
-      MockedFunction<(input: number, second: number) => string>
-    >()
+    subject
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      .calledWith(42, 'hello')
+
+    subject
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      .calledWith(42, 'hello', true)
+
+    subject
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      // @ts-expect-error: too many arguments
+      .calledWith(42, 'hello', true, 'oh no')
   })
 
-  it('should ensure correct type of previous arguments', () => {
+  it('supports using matchers with ignoreExtraArgs', () => {
     subject
-      .when(extraArguments, { ignoreExtraArgs: true })
-      /* @ts-expect-error: first arg is not correct */
-      .calledWith(undefined, 2)
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      .calledWith(expect.any(Number))
+
+    subject
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      .calledWith(expect.any(Number), expect.any(String))
+
+    subject
+      .when(multipleArgs, { ignoreExtraArgs: true })
+      .calledWith(expect.any(Number), expect.any(String), expect.any(Boolean))
   })
 
   it('returns mock type for then resolve', () => {

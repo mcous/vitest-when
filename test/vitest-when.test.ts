@@ -313,4 +313,27 @@ describe('vitest-when', () => {
       expect(spy(...callArgs)).toBe('success')
     },
   )
+
+  it('can spy on an async method', async () => {
+    const target = {
+      // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars
+      async resolveOrganizationSetting(_options: {
+        path: string
+      }): Promise<string[]> {
+        throw new Error('unimplemented')
+      },
+    }
+
+    vi.spyOn(target, 'resolveOrganizationSetting')
+
+    subject
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      .when(target.resolveOrganizationSetting)
+      .calledWith({ path: 'test' })
+      .thenResolve(['value'])
+
+    const result = await target.resolveOrganizationSetting({ path: 'test' })
+
+    expect(result).toEqual(['value'])
+  })
 })

@@ -60,6 +60,22 @@ describe('vitest-when', () => {
     expect(spy()).toEqual(100)
   })
 
+  it('should fall back to original implementation when using vi.spyOn', () => {
+    const calculator = {
+        multiplyByTwo(n: number) {
+            return 2 * n;
+        }
+    }
+
+    const spy = vi.spyOn(calculator, 'multiplyByTwo');
+
+    expect(spy(2)).toEqual(4)
+
+    subject.when(spy).calledWith(1).thenReturn(4)
+    expect(spy(1)).toEqual(4)
+    expect(spy(2)).toEqual(4)
+  })
+
   it('should fall back to original implementation after reset', () => {
     const spy = vi.fn((n) => 2 * n)
 

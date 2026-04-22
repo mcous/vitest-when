@@ -1,7 +1,7 @@
 import {
   format as prettyFormat,
   plugins as prettyFormatPlugins,
-} from 'pretty-format'
+} from '@vitest/pretty-format'
 
 import { type Behavior, BehaviorType } from './behaviors.ts'
 import { getBehaviorStack } from './stubs.ts'

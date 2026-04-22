@@ -139,9 +139,7 @@ describe('vitest-when type signatures', () => {
       .calledWith(1)
       .thenReturn({ simpleMethod: () => '' })
 
-    expectTypeOf(result).branded.toEqualTypeOf<
-      MockedClass<typeof SimpleClass>
-    >()
+    expectTypeOf(result).toEqualTypeOf<MockedClass<typeof SimpleClass>>()
   })
 
   it('should handle a generic function', () => {

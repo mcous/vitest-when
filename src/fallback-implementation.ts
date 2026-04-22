@@ -1,8 +1,8 @@
-import type { AnyFunction, MockInstance } from './types.ts'
+import type { AnyFunction, AnyMockInstance } from './types.ts'
 
 /** Get the fallback implementation of a mock if no matching stub is found. */
 export const getFallbackImplementation = (
-  mock: MockInstance,
+  mock: AnyMockInstance,
 ): AnyFunction | undefined => {
   return (
     (mock.getMockImplementation() as AnyFunction | undefined) ??
@@ -25,7 +25,7 @@ interface TinyspyInternals {
  * which is stored on a Symbol key in the mock object.
  */
 const getTinyspyInternals = (
-  mock: MockInstance,
+  mock: AnyMockInstance,
 ): TinyspyInternals | undefined => {
   const maybeTinyspy = mock as unknown as Record<PropertyKey, unknown>
 

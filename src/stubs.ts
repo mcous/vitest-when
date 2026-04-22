@@ -10,7 +10,6 @@ import type {
   AsFunction,
   Mock,
   MockInstance,
-  NormalizeMockable,
   ParametersOf,
 } from './types.ts'
 
@@ -75,13 +74,13 @@ export const configureMock = <TFunc extends AnyMockable>(
 
 export const validateMock = <TFunc extends AnyMockable>(
   maybeMock: TFunc | MockInstance<TFunc>,
-): MockInstance<NormalizeMockable<TFunc>> => {
+): MockInstance<TFunc> => {
   if (
     typeof maybeMock === 'function' &&
     'mockImplementation' in maybeMock &&
     typeof maybeMock.mockImplementation === 'function'
   ) {
-    return maybeMock as unknown as MockInstance<NormalizeMockable<TFunc>>
+    return maybeMock as unknown as MockInstance<TFunc>
   }
 
   throw new NotAMockFunctionError(maybeMock)
@@ -102,6 +101,6 @@ export const getBehaviorStack = <TFunc extends AnyMockable>(
 
 export const asMock = <TFunc extends AnyMockable>(
   mock: MockInstance<TFunc>,
-): Mock<NormalizeMockable<TFunc>> => {
-  return mock as unknown as Mock<NormalizeMockable<TFunc>>
+): Mock<TFunc> => {
+  return mock as unknown as Mock<TFunc>
 }

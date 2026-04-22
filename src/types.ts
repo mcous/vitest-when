@@ -1,5 +1,5 @@
 /** Common type definitions. */
-import type { MockedClass, MockedFunction } from 'vitest'
+import type { MockedClass, MockedFunction, MockInstance } from 'vitest'
 
 /** Any function. */
 export type AnyFunction = (...args: any[]) => any
@@ -7,37 +7,11 @@ export type AnyFunction = (...args: any[]) => any
 /** Any constructor. */
 export type AnyConstructor = new (...args: any[]) => any
 
-/** Any mockable interface */
+/** Any mockable interface. */
 export type AnyMockable = AnyFunction | AnyConstructor
 
-/**
- * Minimally typed version of Vitest's `MockInstance`.
- *
- * Ensures backwards compatibility with vitest@<2
- */
-export interface MockInstance<TFunc extends AnyMockable = AnyMockable> {
-  getMockName(): string
-  getMockImplementation(): AsFunction<TFunc> | undefined
-  mockImplementation(impl: AsFunction<TFunc>): this
-  mock: {
-    calls: ParametersOf<TFunc>[]
-  }
-}
-
-/**
- * Normalize an inferred mock.
- *
- * When inferring the function type from `MockInstance`, constructors
- * can create a union type instead of a single type due to the union
- * in `ConstructorImplementation`. This type collapses that union.
- *
- * Ensures backwards compatibility with vitest@<2, because this
- * inference issue only happens with a custom `MockInstance`.
- */
-export type NormalizeMockable<TFunc extends AnyMockable> =
-  ConstructorImplementation extends TFunc
-    ? Extract<TFunc, AnyConstructor>
-    : TFunc
+/** Any mock instance, either of a function or a constructor. */
+export type AnyMockInstance = MockInstance<AnyMockable>
 
 /** Extract parameters from either a function or constructor. */
 export type ParametersOf<TFunc extends AnyMockable> =
@@ -85,3 +59,5 @@ export type Mock<TFunc extends AnyMockable> = TFunc extends AnyConstructor
   : TFunc extends AnyFunction
     ? MockedFunction<TFunc>
     : never
+
+export type { MockInstance } from 'vitest'

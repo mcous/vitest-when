@@ -46,6 +46,7 @@ describe('vitest-when type signatures', () => {
     >()
   })
 
+  // eslint-disable-next-line vitest/expect-expect
   it('should handle fewer than required arguments', () => {
     subject.when(multipleArgs, { ignoreExtraArgs: true }).calledWith(42)
 
@@ -166,6 +167,7 @@ describe('vitest-when type signatures', () => {
     expectTypeOf(result).toEqualTypeOf<MockedFunction<() => boolean>>()
   })
 
+  // eslint-disable-next-line vitest/expect-expect
   it('should reject invalid usage of a simple function', () => {
     // @ts-expect-error: args missing
     subject.when(simple).calledWith()
@@ -177,6 +179,7 @@ describe('vitest-when type signatures', () => {
     subject.when(simple).calledWith(1).thenReturn(42)
   })
 
+  // eslint-disable-next-line vitest/expect-expect
   it('should reject invalid usage of a generic function', () => {
     // @ts-expect-error: args missing
     subject.when(generic).calledWith()

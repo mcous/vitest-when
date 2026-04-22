@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "all": "concurrently -g pnpm:coverage pnpm:build pnpm:check:*",
-    "build": "tsup --clean --sourcemap --dts --format esm --target node14 src/vitest-when.ts",
+    "build": "tsdown --sourcemap src/vitest-when.ts",
     "build-and-check": "concurrently -g pnpm:build pnpm:check:*",
     "check:format": "prettier . --check",
     "check:lint": "eslint .",
@@ -42,21 +42,21 @@
   },
   "prettier": "@mcous/prettier-config",
   "dependencies": {
-    "pretty-format": "^30.2.0"
+    "pretty-format": "^30.3.0"
   },
   "devDependencies": {
-    "@mcous/eslint-config": "^0.7.0",
+    "@mcous/eslint-config": "^0.9.0",
     "@mcous/prettier-config": "^0.4.0",
-    "@mcous/typescript-config": "^0.3.0",
-    "@types/node": "^24.9.1",
-    "@vitest/coverage-istanbul": "^4.0.3",
-    "@vitest/expect": "^4.0.3",
+    "@mcous/typescript-config": "^0.4.0",
+    "@types/node": "^25.6.0",
+    "@vitest/coverage-istanbul": "^4.1.5",
+    "@vitest/expect": "^4.1.5",
     "concurrently": "^9.2.1",
-    "eslint": "^9.38.0",
-    "prettier": "^3.6.2",
-    "tsup": "^8.5.0",
-    "typescript": "5.9.3",
-    "vitest": "^4.0.3"
+    "eslint": "^10.2.1",
+    "prettier": "^3.8.3",
+    "tsdown": "^0.21.10",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.5"
   },
   "peerDependencies": {
     "@vitest/expect": ">=0.31.0 <5",
@@ -67,7 +67,10 @@
       "optional": true
     }
   },
-  "packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8",
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@10.33.1+sha512.05ba3c1d5d1c18f68df06470d74055e62d41fc110a0c660db1b2dfb2785327f04cf0f68345d4609bc52089e7fa0343c31593b2f9594e2c5d5da426230acc9820",
   "publishConfig": {
     "access": "public",
     "provenance": true

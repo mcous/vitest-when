@@ -9,14 +9,19 @@ on:
 
 jobs:
   test:
-    name: Test / Node.js ${{ matrix.node-version }} / ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: Test / Node.js ${{ matrix.node-version }} / Vitest ${{ matrix.vitest-version }}
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        node-version: ['18', '20', '22']
+        node-version: ['18', '20', '22', '24']
+        vitest-version: ['latest']
+        include:
+          - node-version: '24'
+            vitest-version: '2'
+          - node-version: '24'
+            vitest-version: '3'
 
     steps:
       - name: Checkout source
@@ -26,6 +31,10 @@ jobs:
         uses: mcous/js/actions/setup@main
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Override vitest version
+        if: matrix.vitest-version != 'latest'
+        run: pnpm add --no-lockfile -D vitest@${{ matrix.vitest-version }} @vitest/expect@${{ matrix.vitest-version }} @vitest/coverage-istanbul@${{ matrix.vitest-version }}
 
       - name: Run tests
         run: pnpm coverage

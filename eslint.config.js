@@ -22,6 +22,11 @@ export default defineConfig(
   },
   {
     files: ['test/typing.test-d.ts'],
+    settings: {
+      vitest: {
+        typecheck: true,
+      },
+    },
     rules: {
       '@typescript-eslint/no-unsafe-argument': 'off',
     },

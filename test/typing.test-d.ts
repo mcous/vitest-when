@@ -139,8 +139,8 @@ describe('vitest-when type signatures', () => {
       .calledWith(1)
       .thenReturn({ simpleMethod: () => '' })
 
-    expectTypeOf(result).toEqualTypeOf<
-      MockedClass<new (input: number) => SimpleClass>
+    expectTypeOf(result).branded.toEqualTypeOf<
+      MockedClass<typeof SimpleClass>
     >()
   })
 
@@ -202,9 +202,7 @@ describe('vitest-when type signatures', () => {
       .calledWith(42)
       .thenReturn({ simpleMethod: () => '' })
 
-    expectTypeOf(result).branded.toEqualTypeOf<
-      MockedClass<new (input: number) => SimpleClass>
-    >()
+    expectTypeOf(result).toEqualTypeOf<MockedClass<typeof SimpleClass>>()
 
     // @ts-expect-error: args wrong type
     subject.when(TestClass).calledWith('42')
@@ -218,9 +216,7 @@ describe('vitest-when type signatures', () => {
         this.simpleMethod = () => `${input}`
       })
 
-    expectTypeOf(result).branded.toEqualTypeOf<
-      MockedClass<new (input: number) => SimpleClass>
-    >()
+    expectTypeOf(result).toEqualTypeOf<MockedClass<typeof SimpleClass>>()
 
     // @ts-expect-error: args wrong type
     subject.when(TestClass).calledWith('42')

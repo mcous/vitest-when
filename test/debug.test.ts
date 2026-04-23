@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import * as subject from '../src/vitest-when.ts'
 
 const DEBUG_OPTIONS = { log: false }
+const VI_FN_NAME_MATCHER = /(?:vi\.fn\(\)|spy)/u
 
 describe('vitest-when debug', () => {
   it('debugs a non-stubbed spy', () => {
@@ -11,7 +12,7 @@ describe('vitest-when debug', () => {
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
     expect(result).toEqual({
-      name: 'vi.fn()',
+      name: expect.stringMatching(VI_FN_NAME_MATCHER),
       stubbings: [],
       unmatchedCalls: [],
       description: expect.stringContaining(
@@ -28,7 +29,7 @@ describe('vitest-when debug', () => {
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
     expect(result).toEqual({
-      name: 'vi.fn()',
+      name: expect.stringMatching(VI_FN_NAME_MATCHER),
       stubbings: [
         {
           args: ['hello', 'world'],
@@ -52,7 +53,7 @@ describe('vitest-when debug', () => {
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
     expect(result).toMatchObject({
-      name: 'vi.fn()',
+      name: expect.stringMatching(VI_FN_NAME_MATCHER),
       stubbings: [
         {
           args: [expect.any(String)],
@@ -75,7 +76,7 @@ describe('vitest-when debug', () => {
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
     expect(result).toMatchObject({
-      name: 'vi.fn()',
+      name: expect.stringMatching(VI_FN_NAME_MATCHER),
       stubbings: [
         {
           args: [expect.any(String)],

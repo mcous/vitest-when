@@ -15,13 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: ['18', '20', '22', '24']
-        vitest-version: ['latest']
-        include:
-          - node-version: '24'
-            vitest-version: '2'
-          - node-version: '24'
-            vitest-version: '3'
+        node-version: ['22', '24']
+        vitest-version: ['2', '3', 'latest', 'beta']
 
     steps:
       - name: Checkout source
@@ -32,9 +27,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Override vitest version
+      - name: Override Vitest version
         if: matrix.vitest-version != 'latest'
-        run: pnpm add --no-lockfile -D vitest@${{ matrix.vitest-version }} @vitest/expect@${{ matrix.vitest-version }} @vitest/coverage-istanbul@${{ matrix.vitest-version }}
+        env:
+          version: ${{ matrix.vitest-version }}
+        run: |
+          pnpm add --no-lockfile -D \
+            vitest@${version} \
+            @vitest/expect@${version} \
+            @vitest/pretty-format@${version} \
+            @vitest/coverage-istanbul@${version}
 
       - name: Run tests
         run: pnpm coverage

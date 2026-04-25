@@ -3,11 +3,11 @@ import { type DebugResult, getDebug } from './debug.ts'
 import { asMock, configureMock, validateMock } from './stubs.ts'
 import type {
   AnyMockable,
+  AnyMockInstance,
   ArgumentsSpec,
   AsFunction,
   Mock,
   MockInstance,
-  NormalizeMockable,
   ParametersOf,
   ReturnTypeOf,
 } from './types.ts'
@@ -37,7 +37,7 @@ export const when = <
 >(
   mock: TFunc | MockInstance<TFunc>,
   options?: TOptions,
-): StubWrapper<NormalizeMockable<TFunc>, TOptions> => {
+): StubWrapper<TFunc, TOptions> => {
   const validatedMock = validateMock(mock)
   const behaviorStack = configureMock(validatedMock)
   const result = asMock(validatedMock)
@@ -77,7 +77,7 @@ export interface DebugOptions {
 }
 
 export const debug = (
-  mock: AnyMockable | MockInstance,
+  mock: AnyMockable | AnyMockInstance,
   options: DebugOptions = {},
 ): DebugResult => {
   const log = options.log ?? true

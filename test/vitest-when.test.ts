@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from 'vitest'
-import vitestPkg from 'vitest/package.json' with { type: 'json' }
 
 import * as subject from '../src/vitest-when.ts'
 import { SimpleClass } from './fixtures.ts'
@@ -20,7 +19,6 @@ expect.extend({
 })
 
 const noop = () => undefined
-const vitestMajorVersion = Number(vitestPkg.version.split('.')[0])
 
 describe('vitest-when', () => {
   it('should raise an error if passed a non-spy', () => {
@@ -61,19 +59,6 @@ describe('vitest-when', () => {
     expect(spy(1, 2, 3)).toEqual(4)
     expect(spy()).toEqual(100)
   })
-
-  it.skipIf(vitestMajorVersion < 3)(
-    'should fall back to original implementation after reset',
-    () => {
-      const spy = vi.fn((n) => 2 * n)
-
-      vi.resetAllMocks()
-
-      subject.when(spy).calledWith(1).thenReturn(4)
-      expect(spy(1)).toEqual(4)
-      expect(spy(2)).toEqual(4)
-    },
-  )
 
   it('should return a number of times', () => {
     const spy = subject

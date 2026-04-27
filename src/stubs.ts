@@ -4,8 +4,8 @@ import {
   createBehaviorStack,
 } from './behaviors.ts'
 import { NotAMockFunctionError } from './errors.ts'
-import { getFallbackImplementation } from './fallback-implementation.ts'
 import type {
+  AnyFunction,
   AnyMockable,
   AsFunction,
   Mock,
@@ -30,7 +30,9 @@ export const configureMock = <TFunc extends AnyMockable>(
   }
 
   const behaviorStack = createBehaviorStack<TFunc>()
-  const fallbackImplementation = getFallbackImplementation(mock)
+  const fallbackImplementation = mock.getMockImplementation() as
+    | AnyFunction
+    | undefined
 
   function implementation(this: ThisType<TFunc>, ...args: ParametersOf<TFunc>) {
     const behavior = behaviorStack.use(args)?.behavior ?? {

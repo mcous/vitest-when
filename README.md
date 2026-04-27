@@ -67,7 +67,11 @@ test('stubbing with vitest-when', () => {
 
 You should call `vi.resetAllMocks()` in your suite's `afterEach` hook to remove the implementation added by `when`. You can also set Vitest's [`mockReset`](https://vitest.dev/config/#mockreset) config to `true` instead of using `afterEach`.
 
+> [!NOTE]
+> In Vitest 3 and earlier, `mockReset` will clear any default implementation passed to `vi.fn()` (e.g. `vi.fn(() => 'fallback')`). To preserve default implementations, **upgrade to Vitest 4 or later**. See [fallback implementations][] for more details and a workaround for earlier versions of Vitest.
+
 [vitest's mock functions]: https://vitest.dev/api/mock.html
+[fallback implementations]: #fallback
 [stubs]: https://en.wikipedia.org/wiki/Test_stub
 [when]: #whenmock-tfunc-options-whenoptions-stubwrappertfunc
 [called-with]: #calledwithargs-parameterstfunc-stubtfunc
@@ -210,6 +214,12 @@ import type { WhenOptions } from 'vitest-when'
 | `ignoreExtraArgs` | `false` | boolean | Ignore extra arguments when matching arguments     |
 | `times`           | N/A     | integer | Only trigger configured behavior a number of times |
 
+#### `vi.spyOn()`
+
+`when()` works with `vi.spyOn()` mocks, but unmatched calls will no-op and return `undefined` rather than falling back to the real implementation. If you need the real implementation as a fallback, consider wrapping the module in an adapter and using `vi.fn()` instead — see [Don't mock what you don't own][no-mock-own].
+
+[no-mock-own]: https://github.com/testdouble/contributing-tests/wiki/Don't-mock-what-you-don't-own
+
 ### `.calledWith(...args: Parameters<TFunc>): Stub<TFunc>`
 
 Create a stub that matches a given set of arguments which you can configure with different behaviors using methods like [`.thenReturn(...)`][then-return].
@@ -273,6 +283,19 @@ const mock = when(vi.fn(() => 'you messed up!')))
 mock('hello') // "world"
 mock('jello') // "you messed up!"
 ```
+
+> [!NOTE]
+> In Vitest 3 and earlier, `mockReset` will clear any default implementation passed to `vi.fn()`. To preserve default implementations, **upgrade to Vitest 4 or later**.
+>
+> As a workaround in Vitest 3 and earlier, you can use a `beforeEach` instead:
+>
+> ```diff
+> - const mockWithFallback = vi.fn(() => 'fallback')
+> + const mockWithFallback = vi.fn()
+> + beforeEach(() => {
+> +   mockWithFallback.mockImplementation(() => 'fallback')
+> + })
+> ```
 
 [mock API]: https://vitest.dev/api/mock.html
 

@@ -317,4 +317,42 @@ describe('vitest-when', () => {
       expect(spy(...callArgs)).toBe('success')
     },
   )
+
+  it('supports ignoreExtraArgs with thenResolve', async () => {
+    const spy = subject
+      .when(vi.fn(), { ignoreExtraArgs: true })
+      .calledWith('hello')
+      .thenResolve('world')
+
+    await expect(spy('hello', 'extra')).resolves.toEqual('world')
+  })
+
+  it('supports ignoreExtraArgs with thenReject', async () => {
+    const error = new Error('oh no')
+
+    const spy = subject
+      .when(vi.fn(), { ignoreExtraArgs: true })
+      .calledWith('hello')
+      .thenReject(error)
+
+    await expect(spy('hello', 'extra')).rejects.toThrow('oh no')
+  })
+
+  it('supports ignoreExtraArgs with thenThrow', () => {
+    const spy = subject
+      .when(vi.fn(), { ignoreExtraArgs: true })
+      .calledWith('hello')
+      .thenThrow(new Error('oh no'))
+
+    expect(() => spy('hello', 'extra')).toThrow('oh no')
+  })
+
+  it('supports ignoreExtraArgs with thenDo', () => {
+    const spy = subject
+      .when(vi.fn(), { ignoreExtraArgs: true })
+      .calledWith('hello')
+      .thenDo(() => 'world')
+
+    expect(spy('hello', 'extra')).toEqual('world')
+  })
 })

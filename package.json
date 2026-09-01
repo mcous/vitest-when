@@ -35,10 +35,9 @@
     "build-and-check": "concurrently -g pnpm:build pnpm:check:*",
     "check:format": "prettier . --check",
     "check:lint": "eslint .",
-    "check:types": "vitest --typecheck.only --run",
     "coverage": "vitest run --coverage",
     "format": "eslint . --fix && prettier . --write",
-    "test": "vitest"
+    "test": "vitest --typecheck"
   },
   "prettier": "@mcous/prettier-config",
   "dependencies": {
@@ -59,8 +58,8 @@
     "vitest": "^4.1.5"
   },
   "peerDependencies": {
-    "@vitest/expect": ">=0.31.0 <5",
-    "vitest": ">=0.31.0 <5"
+    "@vitest/expect": ">=0.31.0 <6",
+    "vitest": ">=0.31.0 <6"
   },
   "peerDependenciesMeta": {
     "@vitest/expect": {
@@ -70,14 +69,9 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "pnpm@10.33.1+sha512.05ba3c1d5d1c18f68df06470d74055e62d41fc110a0c660db1b2dfb2785327f04cf0f68345d4609bc52089e7fa0343c31593b2f9594e2c5d5da426230acc9820",
+  "packageManager": "pnpm@11.25.0+sha512.5cde925b4f075f725eb71fbae18a42ffe784524789f19b61c731cb8721ec28aaee160e01a8d5af4fedb2a42cdbf300efe23db356b0d4a17b4d63e11f8ab7c956",
   "publishConfig": {
     "access": "public",
     "provenance": true
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   }
 }

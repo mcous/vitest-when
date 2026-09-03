@@ -20,11 +20,11 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/vitest-when.d.ts",
-      "import": "./dist/vitest-when.js"
+      "types": "./dist/vitest-when.d.mts",
+      "import": "./dist/vitest-when.mjs"
     }
   },
-  "types": "./dist/vitest-when.d.ts",
+  "types": "./dist/vitest-when.d.mts",
   "files": [
     "dist",
     "src"

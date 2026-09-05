@@ -3,17 +3,17 @@
   @typescript-eslint/no-unnecessary-type-parameters,
 */
 
+import { expectTypeOf } from 'expect-type'
 import {
   describe,
   expect,
-  expectTypeOf,
   it,
   type MockedClass,
   type MockedFunction,
   vi,
 } from 'vitest'
+import * as subject from 'vitest-when'
 
-import * as subject from '../src/vitest-when.ts'
 import {
   complex,
   generic,

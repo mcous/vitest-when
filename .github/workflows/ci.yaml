@@ -23,7 +23,7 @@ jobs:
           - node-version: '24'
             vitest-version: '3'
           - node-version: '24'
-            vitest-version: 'rc'
+            vitest-version: '4'
 
     steps:
       - name: Checkout source
@@ -44,7 +44,7 @@ jobs:
       - name: Upload coverage
         uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b
         with:
-          flag-name: node-${{ matrix.node-version }}-os-${{ matrix.os }}
+          flag-name: node-${{ matrix.node-version }}-vitest-${{ matrix.vitest-version }}
           parallel: true
 
   coverage:

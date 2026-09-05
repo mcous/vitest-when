@@ -1,0 +1,126 @@
+{
+  "runtime": [
+    {
+      "name": "node18-vitest0.31",
+      "node": "18",
+      "vitest": "0.31",
+      "npm": "bundled",
+      "entry": "src"
+    },
+    {
+      "name": "node18-vitest3",
+      "node": "18",
+      "vitest": "3",
+      "npm": "bundled",
+      "entry": "dist"
+    },
+    {
+      "name": "node20-vitest1",
+      "node": "20",
+      "vitest": "1",
+      "npm": "11",
+      "entry": "src"
+    },
+    {
+      "name": "node20-vitest4",
+      "node": "20",
+      "vitest": "4",
+      "npm": "11",
+      "entry": "dist"
+    },
+    {
+      "name": "node22-vitest2",
+      "node": "22",
+      "vitest": "2",
+      "npm": "11",
+      "entry": "dist"
+    },
+    {
+      "name": "node22-vitest4",
+      "node": "22",
+      "vitest": "4",
+      "npm": "11",
+      "entry": "dist"
+    },
+    {
+      "name": "node24-vitest3",
+      "node": "24",
+      "vitest": "3",
+      "npm": "11",
+      "entry": "dist"
+    },
+    {
+      "name": "node24-vitest4",
+      "node": "24",
+      "vitest": "4",
+      "npm": "11",
+      "entry": "dist"
+    },
+    {
+      "name": "node22-vitest5",
+      "node": "22",
+      "vitest": "5",
+      "npm": "11",
+      "entry": "dist"
+    },
+    {
+      "name": "node24-vitest5",
+      "node": "24",
+      "vitest": "5",
+      "npm": "11",
+      "entry": "dist"
+    },
+    {
+      "name": "node24-vitest-rc",
+      "node": "24",
+      "vitest": "rc",
+      "npm": "11",
+      "entry": "dist",
+      "allowFailure": true
+    }
+  ],
+  "typecheck": [
+    {
+      "name": "types-vitest2",
+      "node": "24",
+      "vitest": "2",
+      "typescript": "6.0.3"
+    },
+    {
+      "name": "types-vitest3",
+      "node": "24",
+      "vitest": "3",
+      "typescript": "6.0.3"
+    },
+    {
+      "name": "types-vitest4-ts5.4",
+      "node": "24",
+      "vitest": "4",
+      "typescript": "5.4.5"
+    },
+    {
+      "name": "types-vitest4-ts5.9",
+      "node": "24",
+      "vitest": "4",
+      "typescript": "5.9.3"
+    },
+    {
+      "name": "types-vitest4-ts6.0",
+      "node": "24",
+      "vitest": "4",
+      "typescript": "6.0.3"
+    },
+    {
+      "name": "types-vitest4-ts7.0",
+      "node": "24",
+      "vitest": "4",
+      "typescript": "7.0.2"
+    },
+    {
+      "name": "types-vitest5",
+      "node": "24",
+      "vitest": "5",
+      "typescript": "6.0.3"
+    }
+  ]
+}

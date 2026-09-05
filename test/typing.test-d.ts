@@ -12,8 +12,8 @@ import {
   type MockedFunction,
   vi,
 } from 'vitest'
+import * as subject from 'vitest-when'
 
-import * as subject from '../src/vitest-when.ts'
 import {
   complex,
   generic,

@@ -21,6 +21,20 @@ export default defineConfig(
     },
   },
   {
+    files: ['compat/**/*.{js,mjs}'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+      },
+    },
+    rules: {
+      // These scripts read their own JSON, and the project does not typecheck
+      // JS, so their JSDoc casts do not reach the linter.
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+    },
+  },
+  {
     files: ['test/typing.test-d.ts'],
     settings: {
       vitest: {

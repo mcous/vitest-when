@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from 'vitest'
-import vitestPkg from 'vitest/package.json' with { type: 'json' }
+import { createRequire } from 'node:module'
 
-import * as subject from '../src/vitest-when.ts'
+import { describe, expect, it, vi } from 'vitest'
+import * as subject from 'vitest-when'
+
 import { SimpleClass } from './fixtures.ts'
 
 declare module 'vitest' {
@@ -20,7 +21,10 @@ expect.extend({
 })
 
 const noop = () => undefined
-const vitestMajorVersion = Number(vitestPkg.version.split('.')[0])
+const vitestPackage = createRequire(import.meta.url)('vitest/package.json') as {
+  version: string
+}
+const vitestMajorVersion = Number(vitestPackage.version.split('.')[0])
 
 describe('vitest-when', () => {
   it('should raise an error if passed a non-spy', () => {

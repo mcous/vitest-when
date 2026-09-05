@@ -12,6 +12,14 @@ Stub behaviors of [Vitest][] mock functions with a small, readable API. Inspired
 npm install --save-dev vitest-when
 ```
 
+## Compatibility
+
+Requires Node.js >=18 and Vitest >=0.31 <6.
+
+Every release is verified against the built package in containers, one per Node and Vitest pair. Runtime cells cover Vitest 0.31, 1, 2, 3, and 4 across Node 18, 20, 22, and 24; type cells check the published type declarations against Vitest 2, 3, and 4 and TypeScript 5.4 through 7.0. Run the matrix yourself with `pnpm test:compat`, or a single cell with `pnpm test:compat node20-vitest1`. See [`compat/matrix.json`](./compat/matrix.json).
+
+Type assertions require Vitest >=2; earlier versions execute `.test-d.ts` files as runtime tests rather than typechecking them.
+
 [better-mocks]: https://michael.cousins.io/articles/2023-06-30-better-stubs/
 [vitest]: https://vitest.dev/
 [testdouble.js]: https://github.com/testdouble/testdouble.js/

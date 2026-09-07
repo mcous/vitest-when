@@ -42,9 +42,6 @@
     "test:compat": "pnpm build && ./compat/run-all.sh"
   },
   "prettier": "@mcous/prettier-config",
-  "dependencies": {
-    "pretty-format": "^30.3.0"
-  },
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.5",
     "@mcous/eslint-config": "^0.9.0",
@@ -53,6 +50,7 @@
     "@types/node": "^25.6.0",
     "@vitest/coverage-istanbul": "^5.0.0",
     "@vitest/expect": "^5.0.0",
+    "@vitest/utils": "^5.0.0",
     "concurrently": "^9.2.1",
     "eslint": "^10.2.1",
     "expect-type": "^1.4.0",
@@ -63,13 +61,7 @@
     "vitest": "^5.0.0"
   },
   "peerDependencies": {
-    "@vitest/expect": ">=0.31.0 <6",
     "vitest": ">=0.31.0 <6"
-  },
-  "peerDependenciesMeta": {
-    "@vitest/expect": {
-      "optional": true
-    }
   },
   "engines": {
     "node": ">=18"

@@ -1,7 +1,4 @@
-import {
-  format as prettyFormat,
-  plugins as prettyFormatPlugins,
-} from 'pretty-format'
+import { stringify as prettyStringify } from '@vitest/utils/display'
 
 import { type Behavior, BehaviorType } from './behaviors.ts'
 import { getBehaviorStack } from './stubs.ts'
@@ -93,57 +90,8 @@ const formatBehavior = (behavior: Behavior): string => {
 const count = (amount: number, thing: string) =>
   `${amount} ${thing}${amount === 1 ? '' : 's'}`
 
-const {
-  AsymmetricMatcher,
-  DOMCollection,
-  DOMElement,
-  Immutable,
-  ReactElement,
-  ReactTestComponent,
-} = prettyFormatPlugins
+const STRINGIFY_OPTIONS = { min: true, maxWidth: 10 } as const
 
-const FORMAT_PLUGINS = [
-  ReactTestComponent,
-  ReactElement,
-  DOMElement,
-  DOMCollection,
-  Immutable,
-  AsymmetricMatcher,
-]
-
-const FORMAT_MAX_LENGTH = 10_000
-
-/**
- * Stringify a value.
- *
- * Copied from `jest-matcher-utils`
- * https://github.com/jestjs/jest/blob/654dbd6f6b3d94c604221e1afd70fcfb66f9478e/packages/jest-matcher-utils/src/index.ts#L96
- */
-const stringify = (object: unknown, maxDepth = 10, maxWidth = 10): string => {
-  let result
-
-  try {
-    result = prettyFormat(object, {
-      maxDepth,
-      maxWidth,
-      min: true,
-      plugins: FORMAT_PLUGINS,
-    })
-  } catch {
-    result = prettyFormat(object, {
-      callToJSON: false,
-      maxDepth,
-      maxWidth,
-      min: true,
-      plugins: FORMAT_PLUGINS,
-    })
-  }
-
-  if (result.length >= FORMAT_MAX_LENGTH && maxDepth > 1) {
-    return stringify(object, Math.floor(maxDepth / 2), maxWidth)
-  } else if (result.length >= FORMAT_MAX_LENGTH && maxWidth > 1) {
-    return stringify(object, maxDepth, Math.floor(maxWidth / 2))
-  } else {
-    return result
-  }
-}
+/** Stringify a value for display in debug output. */
+const stringify = (object: unknown): string =>
+  prettyStringify(object, 10, STRINGIFY_OPTIONS)

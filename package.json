@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcous/vitest-when.git"
+    "url": "git+https://github.com/mcous/vitest-when.git"
   },
   "license": "MIT",
   "author": "Michael Cousins <michael@cousins.io> (https://michael.cousins.io)",
@@ -55,7 +55,7 @@
     "eslint": "^10.2.1",
     "prettier": "^3.8.3",
     "publint": "^0.3.24",
-    "tsdown": "^0.23.0",
+    "tsdown": "^0.21.10",
     "typescript": "6.0.3",
     "vitest": "^5.0.0"
   },

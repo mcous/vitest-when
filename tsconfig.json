@@ -4,6 +4,8 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "target": "es2021",
+    "declaration": true,
+    "declarationMap": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "types": ["node"],

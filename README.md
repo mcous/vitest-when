@@ -12,8 +12,22 @@ Stub behaviors of [Vitest][] mock functions with a small, readable API. Inspired
 npm install --save-dev vitest-when
 ```
 
+> [!TIP]
+>
+> Vitest v5 has added native conditional stubbing via [`vi.when`][vitest-conditional-mocking],
+> using the same core API as `vitest-when`.
+>
+> ```ts
+> const stub = vi.fn()
+> vi.when(stub).calledWith('hello').thenReturn('world')
+> ```
+>
+> The `vitest-when` package is now in maintenance mode, continuing to support
+> older versions of Vitest. New projects should use `vitest@>=5` and `vi.when` directly.
+
 [better-mocks]: https://michael.cousins.io/articles/2023-06-30-better-stubs/
 [vitest]: https://vitest.dev/
+[vitest-conditional-mocking]: https://vitest.dev/guide/recipes/conditional-mocking.html
 [testdouble.js]: https://github.com/testdouble/testdouble.js/
 [jest-when]: https://github.com/timkindberg/jest-when
 [npm]: https://npmjs.org/vitest-when

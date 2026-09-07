@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-
-import * as subject from '../src/vitest-when.ts'
+import * as subject from 'vitest-when'
 
 const DEBUG_OPTIONS = { log: false }
 const VI_FN_NAME_MATCHER = /(?:vi\.fn\(\)|spy)/u

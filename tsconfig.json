@@ -19,6 +19,7 @@
     "vitest.config.ts",
     "src",
     "test",
-    "example"
+    "example",
+    "compat"
   ]
 }

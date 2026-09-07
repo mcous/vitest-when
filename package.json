@@ -30,14 +30,16 @@
     "src"
   ],
   "scripts": {
-    "all": "concurrently -g pnpm:coverage pnpm:build pnpm:check:*",
+    "all": "concurrently -g pnpm:coverage pnpm:build pnpm:check:* && pnpm test:compat",
     "build": "tsdown",
     "build-and-check": "concurrently -g pnpm:build pnpm:check:*",
     "check:format": "prettier . --check",
     "check:lint": "eslint .",
+    "check:types": "tsc",
     "coverage": "vitest run --coverage",
     "format": "eslint . --fix && prettier . --write",
-    "test": "vitest --typecheck"
+    "test": "vitest --typecheck",
+    "test:compat": "pnpm build && ./compat/run-all.sh"
   },
   "prettier": "@mcous/prettier-config",
   "dependencies": {
@@ -53,6 +55,7 @@
     "@vitest/expect": "^5.0.0",
     "concurrently": "^9.2.1",
     "eslint": "^10.2.1",
+    "expect-type": "^1.4.0",
     "prettier": "^3.8.3",
     "publint": "^0.3.24",
     "tsdown": "^0.21.10",

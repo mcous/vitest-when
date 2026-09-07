@@ -39,6 +39,9 @@ importers:
       eslint:
         specifier: ^10.2.1
         version: 10.2.1(supports-color@8.1.1)
+      expect-type:
+        specifier: ^1.4.0
+        version: 1.4.0
       prettier:
         specifier: ^3.8.3
         version: 3.8.3

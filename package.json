@@ -1,6 +1,6 @@
 {
   "name": "vitest-when",
-  "version": "0.10.0",
+  "version": "0.10.2",
   "description": "Stub behaviors of Vitest mock functions with a small, readable API.",
   "keywords": [
     "tdd",
@@ -13,71 +13,62 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcous/vitest-when.git"
+    "url": "git+https://github.com/mcous/vitest-when.git"
   },
   "license": "MIT",
   "author": "Michael Cousins <michael@cousins.io> (https://michael.cousins.io)",
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/vitest-when.d.ts",
-      "import": "./dist/vitest-when.js"
+      "types": "./dist/vitest-when.d.mts",
+      "import": "./dist/vitest-when.mjs"
     }
   },
-  "types": "./dist/vitest-when.d.ts",
+  "types": "./dist/vitest-when.d.mts",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
-    "all": "concurrently -g pnpm:coverage pnpm:build pnpm:check:*",
-    "build": "tsdown --sourcemap src/vitest-when.ts",
+    "all": "concurrently -g pnpm:coverage pnpm:build pnpm:check:* && pnpm test:compat",
+    "build": "tsdown",
     "build-and-check": "concurrently -g pnpm:build pnpm:check:*",
     "check:format": "prettier . --check",
     "check:lint": "eslint .",
-    "check:types": "vitest --typecheck.only --run",
+    "check:types": "tsc",
     "coverage": "vitest run --coverage",
     "format": "eslint . --fix && prettier . --write",
-    "test": "vitest"
+    "test": "vitest --typecheck",
+    "test:compat": "pnpm build && ./compat/run-all.sh"
   },
   "prettier": "@mcous/prettier-config",
-  "dependencies": {
-    "pretty-format": "^30.3.0"
-  },
   "devDependencies": {
+    "@arethetypeswrong/core": "^0.18.5",
     "@mcous/eslint-config": "^0.9.0",
     "@mcous/prettier-config": "^0.4.0",
     "@mcous/typescript-config": "^0.4.0",
     "@types/node": "^25.6.0",
-    "@vitest/coverage-istanbul": "^4.1.5",
-    "@vitest/expect": "^4.1.5",
+    "@vitest/coverage-istanbul": "^5.0.0",
+    "@vitest/expect": "^5.0.0",
+    "@vitest/utils": "^5.0.0",
     "concurrently": "^9.2.1",
     "eslint": "^10.2.1",
+    "expect-type": "^1.4.0",
     "prettier": "^3.8.3",
+    "publint": "^0.3.24",
     "tsdown": "^0.21.10",
     "typescript": "6.0.3",
-    "vitest": "^4.1.5"
+    "vitest": "^5.0.0"
   },
   "peerDependencies": {
-    "@vitest/expect": ">=0.31.0 <5",
-    "vitest": ">=0.31.0 <5"
-  },
-  "peerDependenciesMeta": {
-    "@vitest/expect": {
-      "optional": true
-    }
+    "vitest": ">=0.31.0 <6"
   },
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "pnpm@10.33.1+sha512.05ba3c1d5d1c18f68df06470d74055e62d41fc110a0c660db1b2dfb2785327f04cf0f68345d4609bc52089e7fa0343c31593b2f9594e2c5d5da426230acc9820",
+  "packageManager": "pnpm@11.25.0+sha512.5cde925b4f075f725eb71fbae18a42ffe784524789f19b61c731cb8721ec28aaee160e01a8d5af4fedb2a42cdbf300efe23db356b0d4a17b4d63e11f8ab7c956",
   "publishConfig": {
     "access": "public",
     "provenance": true
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   }
 }

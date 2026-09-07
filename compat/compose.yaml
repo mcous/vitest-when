@@ -1,0 +1,117 @@
+# Lowest and highest supported Node for each Vitest version.
+#
+# Usage:
+#   pnpm build && docker compose -f compat/compose.yaml run --rm --build node26-vitest4
+
+x-build: &build
+  context: ..
+  dockerfile: compat/Dockerfile
+
+services:
+  node18-vitest0.31:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '18', VITEST_VERSION: '0.31' }
+
+  node26-vitest0.31:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '26', VITEST_VERSION: '0.31' }
+
+  node18-vitest1:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '18', VITEST_VERSION: '1' }
+
+  node26-vitest1:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '26', VITEST_VERSION: '1' }
+
+  node18-vitest2:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '18', VITEST_VERSION: '2' }
+
+  node26-vitest2:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '26', VITEST_VERSION: '2' }
+
+  node18-vitest3:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '18', VITEST_VERSION: '3' }
+
+  node26-vitest3:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '26', VITEST_VERSION: '3' }
+
+  node20-vitest4:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '20', VITEST_VERSION: '4' }
+
+  node26-vitest4:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '26', VITEST_VERSION: '4' }
+
+  node22-vitest5:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '22', VITEST_VERSION: '5' }
+
+  node26-vitest5:
+    profiles: [runtime]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '26', VITEST_VERSION: '5' }
+
+  types-vitest0.31:
+    profiles: [typecheck]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '24', VITEST_VERSION: '0.31', MODE: typecheck }
+
+  types-vitest1:
+    profiles: [typecheck]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '24', VITEST_VERSION: '1', MODE: typecheck }
+
+  types-vitest2:
+    profiles: [typecheck]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '24', VITEST_VERSION: '2', MODE: typecheck }
+
+  types-vitest3:
+    profiles: [typecheck]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '24', VITEST_VERSION: '3', MODE: typecheck }
+
+  types-vitest4:
+    profiles: [typecheck]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '24', VITEST_VERSION: '4', MODE: typecheck }
+
+  types-vitest5:
+    profiles: [typecheck]
+    build:
+      <<: *build
+      args: { NODE_VERSION: '24', VITEST_VERSION: '5', MODE: typecheck }

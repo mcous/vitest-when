@@ -1,7 +1,5 @@
 # Lowest and highest supported Node for each Vitest version.
 #
-# The `pending` profile is not run: those environments fail until #54 lands.
-#
 # Usage:
 #   pnpm build && docker compose -f compat/compose.yaml run --rm --build node26-vitest4
 
@@ -71,13 +69,13 @@ services:
       args: { NODE_VERSION: '26', VITEST_VERSION: '4' }
 
   node22-vitest5:
-    profiles: [pending]
+    profiles: [runtime]
     build:
       <<: *build
       args: { NODE_VERSION: '22', VITEST_VERSION: '5' }
 
   node26-vitest5:
-    profiles: [pending]
+    profiles: [runtime]
     build:
       <<: *build
       args: { NODE_VERSION: '26', VITEST_VERSION: '5' }

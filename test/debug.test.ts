@@ -177,6 +177,6 @@ describe('vitest-when debug', () => {
 
     const result = subject.debug(spy, DEBUG_OPTIONS)
 
-    expect(result.description).toMatch(/\(\["x.+, …\]\)/u)
+    expect(result.description).toMatch(/\(\["x.+, …\(\d+\)\]\)/u)
   })
 })

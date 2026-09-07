@@ -349,7 +349,9 @@ describe('vitest-when', () => {
       .calledWith('hello')
       .thenThrow(new Error('oh no'))
 
-    expect(() => spy('hello', 'extra')).toThrow('oh no')
+    expect(() => {
+      spy('hello', 'extra')
+    }).toThrow('oh no')
   })
 
   it('supports ignoreExtraArgs with thenDo', () => {
